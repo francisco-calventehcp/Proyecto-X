@@ -1,63 +1,172 @@
-const { scrapeAllSources } = require("../lib/scraper");
-const { rewriteBatch }     = require("../lib/rewriter");
-const { saveNews, getMeta } = require("../lib/storage");
+const Parser = require("rss-parser");
+const cheerio = require("cheerio");
 
-module.exports = async function handler(req, res) {
+const parser = new Parser({
+  timeout: 15000,
+  headers: {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  },
+});
 
-  const authHeader  = req.headers["authorization"];
-  const querySecret = req.query.secret;
-  const cronSecret  = process.env.CRON_SECRET;
+const SOURCES = [
+  {
+    id: "idealista_vivienda",
+    name: "Idealista News — Vivienda",
+    type: "html",
+    url: "https://www.idealista.com/news/inmobiliario/vivienda",
+    maxItems: 6,
+  },
+  {
+    id: "idealista_mercado",
+    name: "Idealista News — Mercado",
+    type: "html",
+    url: "https://www.idealista.com/news/inmobiliario",
+    maxItems: 6,
+  },
+  {
+    id: "casafari",
+    name: "Casafari Insights",
+    type: "rss",
+    url: "https://www.casafari.com/feed",
+    maxItems: 5,
+  },
+];
 
-  if (cronSecret) {
-    const validHeader = authHeader === `Bearer ${cronSecret}`;
-    const validQuery  = querySecret === cronSecret;
-    const validCron   = !!req.headers["x-vercel-cron"];
-    if (!validHeader && !validQuery && !validCron) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-  }
-
-  const meta = await getMeta();
-  if (meta.lastRun) {
-    const hoursSince = (Date.now() - new Date(meta.lastRun).getTime()) / (1000 * 60 * 60);
-    if (hoursSince < 6) {
-      return res.status(200).json({
-        status: "skipped",
-        reason: `Último scrape hace ${hoursSince.toFixed(1)}h`,
-        lastRun: meta.lastRun,
-      });
-    }
-  }
-
-  const startTime = Date.now();
-
+async function scrapeRSS(source) {
   try {
-    const rawArticles = await scrapeAllSources();
+    const feed = await parser.parseURL(source.url);
+    const articles = feed.items.slice(0, source.maxItems).map((item) => ({
+      sourceId: source.id,
+      sourceName: source.name,
+      originalTitle: item.title || "",
+      originalExcerpt: stripHtml(item.contentSnippet || item.content || item.title || "").substring(0, 400),
+      originalUrl: item.link || "",
+      pubDate: item.pubDate || new Date().toISOString(),
+      category: guessCategory(item.title + " " + (item.contentSnippet || "")),
+    }));
+    console.log(`[${source.id}] ${articles.length} artículos via RSS`);
+    return articles;
+  } catch (err) {
+    console.error(`[${source.id}] RSS error:`, err.message);
+    return [];
+  }
+}
 
-    if (rawArticles.length === 0) {
-      return res.status(200).json({ status: "no_content", message: "Sin artículos nuevos" });
-    }
-
-    const rewritten = await rewriteBatch(rawArticles, 8);
-
-    if (rewritten.length === 0) {
-      return res.status(500).json({ status: "error", message: "Rewrites fallaron — revisa GROQ_API_KEY" });
-    }
-
-    const result = await saveNews(rewritten);
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-
-    return res.status(200).json({
-      status:    "success",
-      scraped:   rawArticles.length,
-      rewritten: rewritten.length,
-      saved:     result.added,
-      total:     result.total,
-      elapsed:   `${elapsed}s`,
+async function scrapeHTML(source) {
+  try {
+    const res = await fetch(source.url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "es-ES,es;q=0.9",
+      },
+      signal: AbortSignal.timeout(15000),
     });
 
+    if (!res.ok) {
+      console.error(`[${source.id}] HTTP ${res.status}`);
+      return [];
+    }
+
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const articles = [];
+
+    // Selectores específicos para Idealista News
+    $("article, .item-list, .news-item, h2 a, h3 a, .title-list a")
+      .slice(0, source.maxItems * 3)
+      .each((i, el) => {
+        const $el = $(el);
+        let title = "";
+        let link = "";
+        let excerpt = "";
+
+        if (el.tagName === "a") {
+          title = $el.text().trim();
+          link = $el.attr("href") || "";
+        } else {
+          title = $el.find("h2 a, h3 a, .title a, a").first().text().trim();
+          link = $el.find("h2 a, h3 a, .title a, a").first().attr("href") || "";
+          excerpt = $el.find("p, .excerpt, .description").first().text().trim();
+        }
+
+        if (title && title.length > 20) {
+          const fullUrl = link.startsWith("http")
+            ? link
+            : link.startsWith("/")
+            ? `https://www.idealista.com${link}`
+            : link;
+
+          if (fullUrl && articles.length < source.maxItems) {
+            articles.push({
+              sourceId: source.id,
+              sourceName: source.name,
+              originalTitle: title,
+              originalExcerpt: excerpt.substring(0, 400) || title,
+              originalUrl: fullUrl,
+              pubDate: new Date().toISOString(),
+              category: guessCategory(title + " " + excerpt),
+            });
+          }
+        }
+      });
+
+    console.log(`[${source.id}] ${articles.length} artículos via HTML`);
+    return articles;
   } catch (err) {
-    console.error("[cron] Error:", err);
-    return res.status(500).json({ status: "error", message: err.message });
+    console.error(`[${source.id}] HTML error:`, err.message);
+    return [];
   }
-};
+}
+
+function guessCategory(text) {
+  const rules = [
+    [/oficina|coworking|contrataci[oó]n/i,           "Oficinas"],
+    [/alquil|arrendamiento|inquilino|renta/i,         "Alquiler"],
+    [/log[ií]stic|nave|almac[eé]n|industrial/i,       "Logística"],
+    [/hotel|tur[ií]stic|vacacional/i,                 "Hotelero"],
+    [/centro comercial|retail|tienda/i,               "Comercial"],
+    [/socimi|cotizad|bolsa|dividendo|opa/i,           "SOCIMIs"],
+    [/promot|obra nueva|residencial|vivienda nueva/i, "Residencial"],
+    [/regula|ley|decreto|gobierno|ministerio|boe/i,   "Regulación"],
+    [/proptech|tecnolog|digital|startup/i,            "Proptech"],
+    [/data center|centro de datos/i,                  "Data Centers"],
+    [/inversi[oó]n|fondo|capital|adquisici/i,         "Inversión"],
+    [/precio|hipoteca|compraventa|mercado/i,          "Mercado"],
+    [/suelo|urbanismo|plan parcial/i,                 "Urbanismo"],
+    [/sostenib|verde|esg|rehabilita/i,                "Sostenibilidad"],
+  ];
+  for (const [regex, cat] of rules) {
+    if (regex.test(text)) return cat;
+  }
+  return "Mercado";
+}
+
+function stripHtml(str) {
+  return str.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+
+async function scrapeAllSources() {
+  const allArticles = [];
+
+  for (const source of SOURCES) {
+    const articles = source.type === "rss"
+      ? await scrapeRSS(source)
+      : await scrapeHTML(source);
+    allArticles.push(...articles);
+  }
+
+  const seen = new Set();
+  const unique = allArticles.filter((a) => {
+    const key = a.originalTitle.toLowerCase().replace(/[^a-záéíóúñ]/g, "").substring(0, 40);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  unique.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  console.log(`[scraper] Total: ${allArticles.length} raw → ${unique.length} únicos`);
+  return unique.slice(0, 12);
+}
+
+module.exports = { scrapeAllSources, SOURCES };
