@@ -38,4 +38,46 @@ module.exports = async function handler(req, res) {
       publishedAt: new Date(Date.now() - 7200000).toISOString(),
     },
     {
-      id
+      id: "test004",
+      title: "Los visados de obra nueva caen un 12% y amenazan el objetivo de 100.000 viviendas anuales",
+      excerpt: "El sector promotor alerta de que los cuellos de botella administrativos y el encarecimiento de materiales frenan la producción.",
+      body: "La producción de vivienda nueva en España acumula una caída del 12% en visados de obra nueva en los últimos doce meses, según los datos del Ministerio de Vivienda. La cifra aleja al sector del objetivo de 100.000 nuevas viviendas anuales que los expertos consideran necesario para equilibrar el mercado.\n\nLos promotores identifican tres factores principales detrás de este descenso: la lentitud de los trámites urbanísticos, que en algunas comunidades supera los cuatro años; el encarecimiento de los costes de construcción, que ha subido un 22% desde 2021; y la dificultad para encontrar financiación en un entorno de tipos al alza.\n\nComunidades como Madrid y Andalucía mantienen niveles de actividad superiores a la media, mientras que Cataluña y la Comunitat Valenciana registran los descensos más pronunciados.",
+      category: "Residencial",
+      journalist: "Lorenzo Aduga",
+      journalistInitials: "LA",
+      publishedAt: new Date(Date.now() - 10800000).toISOString(),
+    },
+    {
+      id: "test005",
+      title: "El coworking bate récords en Barcelona con 95.000 m² contratados en 2024",
+      excerpt: "La demanda flexible de oficinas no da señales de ralentización y consolida a Barcelona como hub europeo del coworking.",
+      body: "Barcelona ha cerrado 2024 con un récord histórico en contratación de espacios de coworking, alcanzando los 95.000 metros cuadrados absorbidos durante el ejercicio. La cifra supera en un 23% el máximo anterior y consolida a la ciudad condal como uno de los principales destinos europeos para el trabajo flexible.\n\nLas empresas tecnológicas y los nómadas digitales internacionales son los principales impulsores de esta demanda. Los operadores destacan que la ocupación media de sus centros supera el 88%, con listas de espera en las ubicaciones más demandadas del 22@ y el Eixample.\n\nOperadores como WeWork, IWG y Utopicus han anunciado la apertura de nuevos centros para 2025, sumando más de 40.000 metros cuadrados adicionales a la oferta barcelonesa.",
+      category: "Oficinas",
+      journalist: "Leena Pérez",
+      journalistInitials: "LP",
+      publishedAt: new Date(Date.now() - 14400000).toISOString(),
+    },
+    {
+      id: "test006",
+      title: "Prologis abre su mayor parque logístico en España con 180.000 m² en Guadalajara",
+      excerpt: "La instalación, con certificación LEED Platinum, refuerza el corredor logístico Madrid-Aragón como el más activo de la Península.",
+      body: "Prologis ha inaugurado su mayor instalación logística en España, un parque de 180.000 metros cuadrados ubicado en el municipio de Cabanillas del Campo, en Guadalajara. La inversión asciende a 120 millones de euros y la instalación cuenta con certificación LEED Platinum, convirtiéndose en una de las más sostenibles del sector en Europa.\n\nEl parque, que ya tiene el 70% de su superficie comprometida con tres operadores logísticos de primer nivel, generará más de 800 empleos directos en la zona. La elección de Guadalajara responde a su posición estratégica en el corredor Madrid-Zaragoza-Barcelona y a la disponibilidad de suelo finalista.\n\nEsta apertura refuerza la posición de España como destino prioritario para la inversión logística en el sur de Europa, con una demanda que supera estructuralmente a la oferta disponible.",
+      category: "Logística",
+      journalist: "Paloma Regís",
+      journalistInitials: "PR",
+      publishedAt: new Date(Date.now() - 18000000).toISOString(),
+    },
+  ];
+
+  try {
+    const result = await saveNews(testArticles);
+    return res.status(200).json({
+      status: "success",
+      message: `${result.added} noticias de prueba cargadas`,
+      total: result.total,
+    });
+  } catch (err) {
+    return res.status(500).json({ status: "error", message: err.message });
+  }
+};
+```
