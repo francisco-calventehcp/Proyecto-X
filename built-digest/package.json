@@ -1,0 +1,20 @@
+{
+  "name": "built-digest",
+  "version": "1.0.0",
+  "description": "Portal automático de noticias inmobiliarias — 100% gratuito",
+  "scripts": {
+    "dev": "vercel dev",
+    "seed": "node scripts/seed.js",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.9.0",
+    "@vercel/kv": "^3.0.0",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "rss-parser": "^3.13.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

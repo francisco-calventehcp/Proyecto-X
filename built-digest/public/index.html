@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Built Digest — Noticias inmobiliarias</title>
+  <meta name="description" content="El digest diario del sector inmobiliario español. Noticias, datos de mercado y análisis." />
+  <style>
+    /* ── RESET & BASE ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0a0a0a;
+      --white:   #ffffff;
+      --gray-1:  #f5f5f4;
+      --gray-2:  #e7e5e4;
+      --gray-3:  #a8a29e;
+      --gray-4:  #57534e;
+      --accent:  #d97706;
+      --accent2: #059669;
+      --red:     #dc2626;
+      --font:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --mono:    'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--black);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── HEADER ───────────────────────────────────────────── */
+    header {
+      border-bottom: 2px solid var(--black);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      background: var(--white);
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .header-meta {
+      font-size: 12px;
+      color: var(--gray-3);
+      font-family: var(--mono);
+    }
+
+    /* ── TICKER DE DATOS INE ─────────────────────────────── */
+    .ticker-bar {
+      background: var(--black);
+      color: var(--white);
+      padding: 8px 24px;
+      overflow: hidden;
+      font-size: 11px;
+      font-family: var(--mono);
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      gap: 40px;
+      animation: ticker 40s linear infinite;
+    }
+
+    .ticker-bar:hover .ticker-inner { animation-play-state: paused; }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .ticker-item { display: inline-flex; align-items: center; gap: 8px; }
+    .ticker-label { color: var(--gray-3); }
+    .ticker-value { color: var(--white); font-weight: 600; }
+    .ticker-change.up   { color: #34d399; }
+    .ticker-change.down { color: #f87171; }
+
+    /* ── LAYOUT PRINCIPAL ────────────────────────────────── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── HERO / CATEGORÍAS ───────────────────────────────── */
+    .filters {
+      display: flex;
+      gap: 4px;
+      padding: 20px 0 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-bottom: 1px solid var(--gray-2);
+      margin-bottom: 32px;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      padding: 5px 14px;
+      border: 1.5px solid var(--gray-2);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: none;
+      white-space: nowrap;
+      transition: all 0.15s;
+      color: var(--gray-4);
+    }
+    .filter-btn:hover { border-color: var(--black); color: var(--black); }
+    .filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+
+    /* ── GRID DE NOTICIAS ────────────────────────────────── */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--gray-2);
+      border: 1px solid var(--gray-2);
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 900px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .news-grid { grid-template-columns: 1fr; } }
+
+    /* Primera noticia ocupa 2 columnas */
+    .news-card:first-child {
+      grid-column: span 2;
+    }
+    @media (max-width: 900px) { .news-card:first-child { grid-column: span 1; } }
+
+    .news-card {
+      background: var(--white);
+      padding: 24px;
+      cursor: pointer;
+      transition: background 0.1s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .news-card:hover { background: var(--gray-1); }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-category {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      background: var(--gray-1);
+      color: var(--gray-4);
+    }
+
+    .card-category.Inversión     { background: #fef3c7; color: #92400e; }
+    .card-category.Residencial   { background: #d1fae5; color: #065f46; }
+    .card-category.Oficinas      { background: #dbeafe; color: #1e40af; }
+    .card-category.Regulación    { background: #fce7f3; color: #9d174d; }
+    .card-category.Logística     { background: #ede9fe; color: #4c1d95; }
+    .card-category.SOCIMIs       { background: #fff7ed; color: #9a3412; }
+    .card-category.Proptech      { background: #ecfdf5; color: #064e3b; }
+    .card-category.Mercado       { background: #f0f9ff; color: #0c4a6e; }
+    .card-category.Hotelero      { background: #fdf4ff; color: #6b21a8; }
+    .card-category.Comercial     { background: #fff1f2; color: #9f1239; }
+
+    .card-date {
+      font-size: 11px;
+      color: var(--gray-3);
+      font-family: var(--mono);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: -0.2px;
+    }
+
+    .news-card:first-child .card-title { font-size: 22px; }
+
+    .card-excerpt {
+      font-size: 13px;
+      color: var(--gray-4);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-journalist {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--gray-3);
+      font-weight: 500;
+      padding-top: 8px;
+      border-top: 1px solid var(--gray-2);
+    }
+
+    /* ── TERMÓMETRO DEL MERCADO ──────────────────────────── */
+    .market-section {
+      border-top: 2px solid var(--black);
+      padding: 40px 0;
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-3);
+      margin-bottom: 24px;
+    }
+
+    .indicators-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1px;
+      background: var(--gray-2);
+      border: 1px solid var(--gray-2);
+    }
+
+    @media (max-width: 900px) { .indicators-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 500px) { .indicators-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .indicator-card {
+      background: var(--white);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .ind-label {
+      font-size: 11px;
+      color: var(--gray-3);
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .ind-value {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      font-family: var(--mono);
+      line-height: 1;
+    }
+
+    .ind-change {
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 600;
+    }
+    .ind-change.up   { color: var(--accent2); }
+    .ind-change.down { color: var(--red); }
+    .ind-change.flat { color: var(--gray-3); }
+
+    .ind-date {
+      font-size: 10px;
+      color: var(--gray-3);
+      font-family: var(--mono);
+      margin-top: 2px;
+    }
+
+    /* Sparkline */
+    .sparkline { width: 100%; height: 28px; margin-top: 4px; }
+
+    /* ── MODAL ───────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+    .modal {
+      background: var(--white);
+      max-width: 700px;
+      width: 100%;
+      margin-top: 40px;
+      border: 2px solid var(--black);
+    }
+
+    .modal-header {
+      padding: 24px 28px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--gray-3);
+      line-height: 1;
+      padding: 0;
+    }
+    .modal-close:hover { color: var(--black); }
+
+    .modal-category {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.25;
+    }
+
+    .modal-byline {
+      font-size: 12px;
+      color: var(--gray-3);
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--gray-2);
+    }
+
+    .modal-body {
+      padding: 24px 28px 32px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--gray-4);
+    }
+
+    .modal-body p { margin-bottom: 16px; }
+
+    /* ── ESTADOS ─────────────────────────────────────────── */
+    .state-loading, .state-empty {
+      padding: 80px 24px;
+      text-align: center;
+      color: var(--gray-3);
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--gray-2);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      border-top: 2px solid var(--black);
+      padding: 24px;
+      font-size: 11px;
+      color: var(--gray-3);
+      font-family: var(--mono);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #last-updated { color: var(--gray-3); }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ──────────────────────────────────────────── -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-dot"></span>
+        Built Digest
+      </div>
+      <div class="header-meta">SECTOR INMOBILIARIO ESPAÑOL</div>
+    </div>
+  </header>
+
+  <!-- ── TICKER DE DATOS ─────────────────────────────────── -->
+  <div class="ticker-bar">
+    <div class="ticker-inner" id="ticker-inner">
+      <span class="ticker-item">
+        <span class="ticker-label">Cargando datos de mercado...</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ── CONTENIDO PRINCIPAL ─────────────────────────────── -->
+  <main class="container">
+
+    <!-- Filtros de categoría -->
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-cat="Todos">Todos</button>
+      <button class="filter-btn" data-cat="Mercado">Mercado</button>
+      <button class="filter-btn" data-cat="Residencial">Residencial</button>
+      <button class="filter-btn" data-cat="Inversión">Inversión</button>
+      <button class="filter-btn" data-cat="Oficinas">Oficinas</button>
+      <button class="filter-btn" data-cat="Logística">Logística</button>
+      <button class="filter-btn" data-cat="Regulación">Regulación</button>
+      <button class="filter-btn" data-cat="SOCIMIs">SOCIMIs</button>
+      <button class="filter-btn" data-cat="Proptech">Proptech</button>
+      <button class="filter-btn" data-cat="Hotelero">Hotelero</button>
+      <button class="filter-btn" data-cat="Comercial">Comercial</button>
+    </div>
+
+    <!-- Grid de noticias -->
+    <div id="news-container">
+      <div class="state-loading">
+        <div class="spinner"></div>
+        <div>Cargando noticias...</div>
+      </div>
+    </div>
+
+    <!-- Termómetro del mercado -->
+    <section class="market-section">
+      <div class="section-title">Termómetro del mercado — Datos INE</div>
+      <div class="indicators-grid" id="indicators-grid">
+        <!-- Se rellena con JS -->
+        <div class="indicator-card" style="grid-column:1/-1; padding:40px; text-align:center; color:#a8a29e; font-size:13px;">
+          Cargando datos del INE...
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── MODAL DE ARTÍCULO ───────────────────────────────── -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-category" id="modal-category"></div>
+        <h2 class="modal-title" id="modal-title"></h2>
+        <div class="modal-byline" id="modal-byline"></div>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ──────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <span>Built Digest © 2024 — Portal automático de noticias inmobiliarias</span>
+      <span id="last-updated">—</span>
+    </div>
+  </footer>
+
+  <script>
+    // ── ESTADO ─────────────────────────────────────────────
+    let allArticles = [];
+    let activeCategory = 'Todos';
+
+    // ── FECHA LEGIBLE ──────────────────────────────────────
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function timeAgo(iso) {
+      if (!iso) return '';
+      const diff = (Date.now() - new Date(iso)) / 1000;
+      if (diff < 3600) return `Hace ${Math.round(diff/60)} min`;
+      if (diff < 86400) return `Hace ${Math.round(diff/3600)} h`;
+      return formatDate(iso);
+    }
+
+    // ── CARGAR NOTICIAS ────────────────────────────────────
+    async function loadNews() {
+      try {
+        const res = await fetch('/api/news?limit=20');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        allArticles = data.articles || [];
+
+        if (data.lastUpdated) {
+          document.getElementById('last-updated').textContent =
+            'Actualizado: ' + timeAgo(data.lastUpdated);
+        }
+
+        renderNews(allArticles);
+      } catch (err) {
+        document.getElementById('news-container').innerHTML = `
+          <div class="state-empty">
+            <div style="font-size:32px;margin-bottom:12px">📭</div>
+            <div style="font-weight:700;margin-bottom:6px">Sin contenido todavía</div>
+            <div style="font-size:13px">Ejecuta el seed inicial para cargar las primeras noticias.</div>
+          </div>`;
+      }
+    }
+
+    // ── RENDERIZAR NOTICIAS ────────────────────────────────
+    function renderNews(articles) {
+      const container = document.getElementById('news-container');
+
+      const filtered = activeCategory === 'Todos'
+        ? articles
+        : articles.filter(a => a.category === activeCategory);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="state-empty">
+            <div>No hay noticias en esta categoría aún.</div>
+          </div>`;
+        return;
+      }
+
+      const cards = filtered.map((article, i) => `
+        <article class="news-card" onclick="openModal(${i})" data-idx="${i}">
+          <div class="card-meta">
+            <span class="card-category ${article.category}">${article.category || 'Mercado'}</span>
+            <span class="card-date">${timeAgo(article.publishedAt)}</span>
+          </div>
+          <h2 class="card-title">${escHtml(article.title)}</h2>
+          <p class="card-excerpt">${escHtml(article.excerpt)}</p>
+          <div class="card-journalist">${escHtml(article.journalist || '')}</div>
+        </article>
+      `).join('');
+
+      container.innerHTML = `<div class="news-grid">${cards}</div>`;
+    }
+
+    // ── MODAL ──────────────────────────────────────────────
+    function openModal(idx) {
+      const filtered = activeCategory === 'Todos'
+        ? allArticles
+        : allArticles.filter(a => a.category === activeCategory);
+      const article = filtered[idx];
+      if (!article) return;
+
+      document.getElementById('modal-category').textContent = article.category || '';
+      document.getElementById('modal-title').textContent = article.title;
+      document.getElementById('modal-byline').textContent =
+        `${article.journalist || ''} · ${formatDate(article.publishedAt)}`;
+
+      // Cuerpo: convertir párrafos en <p>
+      const body = (article.body || article.excerpt || '')
+        .split(/\n+/)
+        .filter(p => p.trim())
+        .map(p => `<p>${escHtml(p)}</p>`)
+        .join('');
+      document.getElementById('modal-body').innerHTML = body;
+
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (e && e.target !== document.getElementById('modal-overlay') && e.type !== 'click') return;
+      if (e && e.currentTarget === document.getElementById('modal-overlay') && e.target !== e.currentTarget) return;
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ── FILTROS ────────────────────────────────────────────
+    document.getElementById('filters').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn) return;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = btn.dataset.cat;
+      renderNews(allArticles);
+    });
+
+    // ── DATOS INE ──────────────────────────────────────────
+    async function loadMarketData() {
+      try {
+        const res = await fetch('/api/data');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        renderIndicators(data.indicators || {});
+        renderTicker(data.indicators || {});
+      } catch (err) {
+        document.getElementById('indicators-grid').innerHTML =
+          `<div class="indicator-card" style="grid-column:1/-1;padding:32px;text-align:center;color:#a8a29e;font-size:13px;">
+            No se pudieron cargar los datos del INE en este momento.
+          </div>`;
+      }
+    }
+
+    function renderIndicators(indicators) {
+      const grid = document.getElementById('indicators-grid');
+      const keys = Object.keys(indicators);
+      if (keys.length === 0) {
+        grid.innerHTML = `<div class="indicator-card" style="grid-column:1/-1;padding:32px;text-align:center;color:#a8a29e;font-size:13px;">Sin datos disponibles.</div>`;
+        return;
+      }
+
+      grid.innerHTML = keys.map(key => {
+        const ind = indicators[key];
+        const mom = ind.changes?.mom;
+        const yoy = ind.changes?.yoy;
+        const changeClass = mom > 0 ? 'up' : mom < 0 ? 'down' : 'flat';
+        const changeSign  = mom > 0 ? '▲' : mom < 0 ? '▼' : '—';
+        const sparkSvg = renderSparkline(ind.history || []);
+
+        return `
+          <div class="indicator-card">
+            <div class="ind-label">${ind.label}</div>
+            <div class="ind-value">${ind.latest?.formatted || '—'}</div>
+            <div class="ind-change ${changeClass}">
+              ${mom !== null ? `${changeSign} ${Math.abs(mom)}% mensual` : '—'}
+            </div>
+            ${yoy !== null ? `<div class="ind-change ${yoy > 0 ? 'up' : 'down'}" style="font-size:10px">${yoy > 0 ? '▲' : '▼'} ${Math.abs(yoy)}% interanual</div>` : ''}
+            <div class="ind-date">${ind.latest?.date || '—'}</div>
+            ${sparkSvg}
+          </div>`;
+      }).join('');
+    }
+
+    function renderSparkline(history) {
+      if (!history || history.length < 2) return '';
+      const values = history.map(d => d.value).filter(v => v !== null);
+      if (values.length < 2) return '';
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const range = max - min || 1;
+      const W = 100, H = 28;
+      const points = values.map((v, i) => {
+        const x = (i / (values.length - 1)) * W;
+        const y = H - ((v - min) / range) * H;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+      const last = values[values.length - 1];
+      const prev = values[values.length - 2];
+      const color = last >= prev ? '#059669' : '#dc2626';
+      return `
+        <svg class="sparkline" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+          <polyline points="${points}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>`;
+    }
+
+    function renderTicker(indicators) {
+      const keys = Object.keys(indicators);
+      if (keys.length === 0) return;
+
+      const items = keys.map(key => {
+        const ind = indicators[key];
+        const mom = ind.changes?.mom;
+        const cls = mom > 0 ? 'up' : mom < 0 ? 'down' : 'flat';
+        const sign = mom > 0 ? '▲' : mom < 0 ? '▼' : '';
+        return `
+          <span class="ticker-item">
+            <span class="ticker-label">${ind.label}</span>
+            <span class="ticker-value">${ind.latest?.formatted || '—'}</span>
+            ${mom !== null ? `<span class="ticker-change ${cls}">${sign}${Math.abs(mom)}%</span>` : ''}
+          </span>`;
+      }).join('');
+
+      // Duplicar para el loop continuo
+      document.getElementById('ticker-inner').innerHTML = items + items;
+    }
+
+    // ── HELPERS ────────────────────────────────────────────
+    function escHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── INIT ───────────────────────────────────────────────
+    loadNews();
+    loadMarketData();
+  </script>
+
+</body>
+</html>
