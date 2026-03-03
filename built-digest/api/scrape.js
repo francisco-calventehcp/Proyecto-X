@@ -2,7 +2,6 @@
 // API /api/scrape — Cron diario: scraping + IA + guardado
 // Se ejecuta automáticamente cada día a las 7:00 AM (Vercel Cron)
 // ─────────────────────────────────────────────────────────────
-
 const { scrapeAllSources } = require("../lib/scraper");
 const { rewriteBatch }     = require("../lib/rewriter");
 const { saveNews, getMeta } = require("../lib/storage");
@@ -10,11 +9,15 @@ const { saveNews, getMeta } = require("../lib/storage");
 module.exports = async function handler(req, res) {
 
   // ── AUTENTICACIÓN ──────────────────────────────────────────
-  const authHeader = req.headers["authorization"];
-  const cronSecret = process.env.CRON_SECRET;
+  const authHeader  = req.headers["authorization"];
+  const querySecret = req.query.secret;
+  const cronSecret  = process.env.CRON_SECRET;
 
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    if (!req.headers["x-vercel-cron"]) {
+  if (cronSecret) {
+    const validHeader = authHeader === `Bearer ${cronSecret}`;
+    const validQuery  = querySecret === cronSecret;
+    const validCron   = !!req.headers["x-vercel-cron"];
+    if (!validHeader && !validQuery && !validCron) {
       return res.status(401).json({ error: "Unauthorized" });
     }
   }
@@ -55,18 +58,18 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 3. Guardar en Vercel KV
+    // 3. Guardar en base de datos
     const result = await saveNews(rewritten);
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
     console.log(`[cron] Completado en ${elapsed}s — ${result.added} nuevos artículos`);
 
     return res.status(200).json({
-      status: "success",
-      scraped:  rawArticles.length,
+      status:    "success",
+      scraped:   rawArticles.length,
       rewritten: rewritten.length,
-      saved:    result.added,
-      total:    result.total,
-      elapsed:  `${elapsed}s`,
+      saved:     result.added,
+      total:     result.total,
+      elapsed:   `${elapsed}s`,
     });
 
   } catch (err) {
