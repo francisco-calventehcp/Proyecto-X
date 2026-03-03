@@ -1,79 +1,150 @@
-// ─────────────────────────────────────────────────────────────
-// API /api/scrape — Cron diario: scraping + IA + guardado
-// Se ejecuta automáticamente cada día a las 7:00 AM (Vercel Cron)
-// ─────────────────────────────────────────────────────────────
-const { scrapeAllSources } = require("../lib/scraper");
-const { rewriteBatch }     = require("../lib/rewriter");
-const { saveNews, getMeta } = require("../lib/storage");
+const Parser = require("rss-parser");
+const cheerio = require("cheerio");
 
-module.exports = async function handler(req, res) {
+const parser = new Parser({
+  timeout: 15000,
+  headers: {
+    "User-Agent": "Mozilla/5.0 (compatible; BuiltDigestBot/1.0; +https://builtdigest.com)",
+  },
+});
 
-  // ── AUTENTICACIÓN ──────────────────────────────────────────
-  const authHeader  = req.headers["authorization"];
-  const querySecret = req.query.secret;
-  const cronSecret  = process.env.CRON_SECRET;
+const SOURCES = [
+  {
+    id: "brainsre",
+    name: "Brainsre News",
+    type: "rss",
+    url: "https://brainsre.news/feed/",
+    maxItems: 8,
+  },
+  {
+    id: "observatorio",
+    name: "Observatorio Inmobiliario",
+    type: "rss",
+    url: "https://observatorioinmobiliario.es/feed/",
+    maxItems: 6,
+  },
+  {
+    id: "ejeprime",
+    name: "EjePrime",
+    type: "html",
+    url: "https://www.ejeprime.com/",
+    maxItems: 6,
+  },
+];
 
-  if (cronSecret) {
-    const validHeader = authHeader === `Bearer ${cronSecret}`;
-    const validQuery  = querySecret === cronSecret;
-    const validCron   = !!req.headers["x-vercel-cron"];
-    if (!validHeader && !validQuery && !validCron) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-  }
-
-  // ── RATE LIMIT: mínimo 6h entre ejecuciones ───────────────
-  const meta = await getMeta();
-  if (meta.lastRun) {
-    const hoursSince = (Date.now() - new Date(meta.lastRun).getTime()) / (1000 * 60 * 60);
-    if (hoursSince < 6) {
-      return res.status(200).json({
-        status: "skipped",
-        reason: `Último scrape hace ${hoursSince.toFixed(1)}h (mínimo 6h entre ejecuciones)`,
-        lastRun: meta.lastRun,
-      });
-    }
-  }
-
-  const startTime = Date.now();
-  console.log("[cron] Iniciando scrape diario...");
-
+async function scrapeRSS(source) {
   try {
-    // 1. Scraping de fuentes
-    const rawArticles = await scrapeAllSources();
-    console.log(`[cron] ${rawArticles.length} artículos scraped`);
-
-    if (rawArticles.length === 0) {
-      return res.status(200).json({ status: "no_content", message: "Sin artículos nuevos" });
-    }
-
-    // 2. Reescritura con IA (máx 8 para controlar uso de API)
-    const rewritten = await rewriteBatch(rawArticles, 8);
-    console.log(`[cron] ${rewritten.length} artículos reescritos`);
-
-    if (rewritten.length === 0) {
-      return res.status(500).json({
-        status: "error",
-        message: "Todos los rewrites fallaron — revisa GROQ_API_KEY",
-      });
-    }
-
-    // 3. Guardar en base de datos
-    const result = await saveNews(rewritten);
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`[cron] Completado en ${elapsed}s — ${result.added} nuevos artículos`);
-
-    return res.status(200).json({
-      status:    "success",
-      scraped:   rawArticles.length,
-      rewritten: rewritten.length,
-      saved:     result.added,
-      total:     result.total,
-      elapsed:   `${elapsed}s`,
-    });
-
+    const feed = await parser.parseURL(source.url);
+    const articles = feed.items.slice(0, source.maxItems).map((item) => ({
+      sourceId: source.id,
+      sourceName: source.name,
+      originalTitle: item.title || "",
+      originalExcerpt: stripHtml(item.contentSnippet || item.content || "").substring(0, 400),
+      originalUrl: item.link || "",
+      pubDate: item.pubDate || new Date().toISOString(),
+      category: guessCategory(item.title + " " + (item.contentSnippet || "")),
+    }));
+    console.log(`[${source.id}] ${articles.length} artículos via RSS`);
+    return articles;
   } catch (err) {
-    console.error("[cron] Error fatal:", err);
-    return res.status(500).json({ status: "error", message: err.message });
+    console.error(`[${source.id}] RSS error:`, err.message);
+    return [];
   }
-};
+}
+
+async function scrapeHTML(source) {
+  try {
+    const res = await fetch(source.url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; BuiltDigestBot/1.0; +https://builtdigest.com)",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const articles = [];
+
+    $("article, .post, .entry, .news-item, .article-card, .td-module-container")
+      .slice(0, source.maxItems)
+      .each((i, el) => {
+        const $el = $(el);
+        const title =
+          $el.find("h2 a, h3 a, .title a, .entry-title a").first().text().trim() ||
+          $el.find("h2, h3, .title, .entry-title").first().text().trim();
+        const link =
+          $el.find("h2 a, h3 a, .title a, .entry-title a").first().attr("href") || "";
+        const excerpt =
+          $el.find("p, .excerpt, .summary, .entry-content").first().text().trim();
+
+        if (title && title.length > 15) {
+          articles.push({
+            sourceId: source.id,
+            sourceName: source.name,
+            originalTitle: title,
+            originalExcerpt: excerpt.substring(0, 400),
+            originalUrl: link.startsWith("http") ? link : new URL(link, source.url).href,
+            pubDate: new Date().toISOString(),
+            category: guessCategory(title + " " + excerpt),
+          });
+        }
+      });
+
+    console.log(`[${source.id}] ${articles.length} artículos via HTML`);
+    return articles;
+  } catch (err) {
+    console.error(`[${source.id}] HTML error:`, err.message);
+    return [];
+  }
+}
+
+function guessCategory(text) {
+  const rules = [
+    [/oficina|coworking|contrataci[oó]n/i,           "Oficinas"],
+    [/alquil|arrendamiento|inquilino|renta/i,         "Alquiler"],
+    [/log[ií]stic|nave|almac[eé]n|industrial/i,       "Logística"],
+    [/hotel|tur[ií]stic|vacacional/i,                 "Hotelero"],
+    [/centro comercial|retail|tienda/i,               "Comercial"],
+    [/socimi|cotizad|bolsa|dividendo|opa/i,           "SOCIMIs"],
+    [/promot|obra nueva|residencial|vivienda nueva/i, "Residencial"],
+    [/regula|ley|decreto|gobierno|ministerio|boe/i,   "Regulación"],
+    [/proptech|tecnolog|digital|startup/i,            "Proptech"],
+    [/data center|centro de datos/i,                  "Data Centers"],
+    [/inversi[oó]n|fondo|capital|adquisici/i,         "Inversión"],
+    [/precio|hipoteca|compraventa|mercado/i,          "Mercado"],
+    [/suelo|urbanismo|plan parcial/i,                 "Urbanismo"],
+    [/sostenib|verde|esg|rehabilita/i,                "Sostenibilidad"],
+  ];
+  for (const [regex, cat] of rules) {
+    if (regex.test(text)) return cat;
+  }
+  return "Mercado";
+}
+
+function stripHtml(str) {
+  return str.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+
+async function scrapeAllSources() {
+  const allArticles = [];
+
+  for (const source of SOURCES) {
+    const articles = source.type === "rss"
+      ? await scrapeRSS(source)
+      : await scrapeHTML(source);
+    allArticles.push(...articles);
+  }
+
+  const seen = new Set();
+  const unique = allArticles.filter((a) => {
+    const key = a.originalTitle.toLowerCase().replace(/[^a-záéíóúñ]/g, "").substring(0, 40);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  unique.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  console.log(`[scraper] Total: ${allArticles.length} raw → ${unique.length} únicos`);
+  return unique.slice(0, 12);
+}
+
+module.exports = { scrapeAllSources, SOURCES };
