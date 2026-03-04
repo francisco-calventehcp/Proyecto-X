@@ -1,83 +1,72 @@
-// Genera artículos de muestra basados en noticias reales del sector
-// No depende de RSS externos que pueden fallar
+const { scrapeAllSources } = require("../lib/scraper");
+const { rewriteBatch }     = require("../lib/rewriter");
+const { saveNews, getMeta } = require("../lib/storage");
 
-function generateSeedArticles() {
-  const templates = [
-    {
-      originalTitle: "El precio de la vivienda en España sube un 8,2% en el último trimestre",
-      originalExcerpt: "Los datos del INE confirman que el mercado residencial mantiene su tendencia alcista impulsado por la escasez de oferta y la demanda sostenida en las grandes ciudades.",
-      category: "Mercado",
-    },
-    {
-      originalTitle: "Madrid y Barcelona concentran el 40% de la inversión inmobiliaria en España",
-      originalExcerpt: "Los inversores institucionales siguen apostando por los dos grandes mercados urbanos españoles ante la falta de producto en otras plazas europeas.",
-      category: "Inversión",
-    },
-    {
-      originalTitle: "La contratación de oficinas en Madrid supera los 200.000 m² en el primer trimestre",
-      originalExcerpt: "El mercado de oficinas recupera niveles prepandemia con una demanda liderada por empresas tecnológicas y de servicios financieros.",
-      category: "Oficinas",
-    },
-    {
-      originalTitle: "El Gobierno aprueba nuevas medidas para frenar el precio del alquiler en zonas tensionadas",
-      originalExcerpt: "El Ministerio de Vivienda amplía las áreas declaradas como tensionadas a 12 nuevas ciudades, limitando las subidas anuales al IPC.",
-      category: "Regulación",
-    },
-    {
-      originalTitle: "Neinor Homes lanza 1.200 nuevas viviendas en la Comunidad de Madrid",
-      originalExcerpt: "La promotora acelera su plan de expansión residencial con nuevos proyectos en los municipios del corredor del Henares y el sur metropolitano.",
-      category: "Residencial",
-    },
-    {
-      originalTitle: "Los visados de obra nueva caen un 12% ante el encarecimiento de los materiales",
-      originalExcerpt: "La construcción residencial acusa el impacto de los costes de edificación, que han subido un 18% en los últimos dos años según los datos de los colegios de arquitectos.",
-      category: "Residencial",
-    },
-    {
-      originalTitle: "Merlin Properties dispara su beneficio un 23% gracias a las rentas de oficinas y logística",
-      originalExcerpt: "La SOCIMI española mejora sus resultados operativos apoyada en la revisión al alza de contratos de arrendamiento y la reducción de la tasa de desocupación.",
-      category: "SOCIMIs",
-    },
-    {
-      originalTitle: "El sector logístico capta 800 millones de euros en inversión durante el primer semestre",
-      originalExcerpt: "Las naves industriales y los centros de distribución siguen siendo el activo más demandado por los fondos de inversión internacionales en el mercado español.",
-      category: "Logística",
-    },
-    {
-      originalTitle: "Las hipotecas a tipo fijo recuperan protagonismo tras la bajada del Euríbor",
-      originalExcerpt: "La moderación del indicador de referencia acerca las condiciones de los préstamos a tipo fijo a los variables, generando un cambio de tendencia en la firma de nuevas hipotecas.",
-      category: "Mercado",
-    },
-    {
-      originalTitle: "Barcelona declara zona tensionada el 100% de su territorio municipal",
-      originalExcerpt: "El Ayuntamiento de Barcelona aplica la ley de vivienda estatal para limitar los precios del alquiler en toda la ciudad, una medida que ya afecta a más de 75.000 contratos.",
-      category: "Regulación",
-    },
-    {
-      originalTitle: "Blackstone adquiere una cartera de 3.000 viviendas en alquiler por 450 millones",
-      originalExcerpt: "El fondo estadounidense refuerza su posición en el mercado español de build-to-rent con la mayor operación del año en el segmento residencial en alquiler.",
-      category: "Inversión",
-    },
-    {
-      originalTitle: "El proptech español capta 200 millones en financiación durante 2024",
-      originalExcerpt: "Las startups tecnológicas del sector inmobiliario español consolidan su crecimiento con nuevas rondas de inversión centradas en soluciones de gestión de activos y tokenización.",
-      category: "Proptech",
-    },
-  ];
+console.log("[scrape] Módulos cargados OK");
 
-  return templates.map((t, i) => ({
-    ...t,
-    sourceId: "seed",
-    sourceName: "Built Digest",
-    originalUrl: "",
-    pubDate: new Date(Date.now() - i * 3600000).toISOString(),
-  }));
-}
+module.exports = async function handler(req, res) {
 
-async function scrapeAllSources() {
-  const articles = generateSeedArticles();
-  console.log(`[scraper] ${articles.length} artículos generados`);
-  return articles;
-}
+  const authHeader  = req.headers["authorization"];
+  const querySecret = req.query.secret;
+  const cronSecret  = process.env.CRON_SECRET;
 
-module.exports = { scrapeAllSources };
+  if (cronSecret) {
+    const validHeader = authHeader === `Bearer ${cronSecret}`;
+    const validQuery  = querySecret === cronSecret;
+    const validCron   = !!req.headers["x-vercel-cron"];
+    if (!validHeader && !validQuery && !validCron) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+  }
+
+  const meta = await getMeta();
+  if (meta.lastRun) {
+    const hoursSince = (Date.now() - new Date(meta.lastRun).getTime()) / (1000 * 60 * 60);
+    if (hoursSince < 6) {
+      return res.status(200).json({
+        status: "skipped",
+        reason: `Último scrape hace ${hoursSince.toFixed(1)}h`,
+        lastRun: meta.lastRun,
+      });
+    }
+  }
+
+  const startTime = Date.now();
+  console.log("[scrape] Iniciando...");
+
+  try {
+    console.log("[scrape] Llamando scrapeAllSources...");
+    const rawArticles = await scrapeAllSources();
+    console.log(`[scrape] ${rawArticles.length} artículos obtenidos`);
+
+    if (rawArticles.length === 0) {
+      return res.status(200).json({ status: "no_content", message: "Sin artículos nuevos" });
+    }
+
+    console.log("[scrape] Llamando rewriteBatch...");
+    const rewritten = await rewriteBatch(rawArticles, 8);
+    console.log(`[scrape] ${rewritten.length} artículos reescritos`);
+
+    if (rewritten.length === 0) {
+      return res.status(500).json({ status: "error", message: "Rewrites fallaron — revisa GROQ_API_KEY" });
+    }
+
+    console.log("[scrape] Guardando en base de datos...");
+    const result = await saveNews(rewritten);
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    return res.status(200).json({
+      status:    "success",
+      scraped:   rawArticles.length,
+      rewritten: rewritten.length,
+      saved:     result.added,
+      total:     result.total,
+      elapsed:   `${elapsed}s`,
+    });
+
+  } catch (err) {
+    console.error("[scrape] Error:", err.message);
+    console.error("[scrape] Stack:", err.stack);
+    return res.status(500).json({ status: "error", message: err.message });
+  }
+};
