@@ -6,11 +6,27 @@
     }
   ],
   "functions": {
-    "api/scrape.js": { "maxDuration": 60 },
-    "api/news.js":   { "maxDuration": 10 },
-    "api/data.js":   { "maxDuration": 30 }
+    "api/scrape.js": {
+      "maxDuration": 60
+    },
+    "api/news.js": {
+      "maxDuration": 10
+    },
+    "api/data.js": {
+      "maxDuration": 30
+    },
+    "api/add-news.js": {
+      "maxDuration": 10
+    }
   },
   "rewrites": [
-    { "source": "/", "destination": "/index.html" }
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
   ]
 }
