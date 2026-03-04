@@ -15,7 +15,6 @@
     }
     body { font-family: var(--font); background: #0a0a0a; color: var(--white); min-height: 100vh; }
 
-    /* GATE */
     #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; padding: 40px; }
     .gate-logo { font-size: 13px; font-family: var(--mono); color: var(--gray-3); letter-spacing: 0.15em; text-transform: uppercase; }
     .gate-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
@@ -24,31 +23,27 @@
     .gate-input input::placeholder { color: #444; }
     .gate-input button { padding: 12px 20px; background: var(--accent); border: none; color: var(--white); font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; }
     .gate-input button:hover { background: #b45309; }
-    .gate-error { font-size: 12px; color: var(--red); font-family: var(--mono); display: none; }
 
-    /* PANEL */
     #panel { display: none; }
     .admin-header { border-bottom: 1px solid #1a1a1a; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 56px; background: #0d0d0d; position: sticky; top: 0; z-index: 100; }
     .admin-logo { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
     .admin-badge { font-size: 10px; font-family: var(--mono); color: var(--accent); background: rgba(217,119,6,0.12); padding: 3px 8px; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
-    .admin-nav { display: flex; gap: 4px; }
+    .admin-nav { display: flex; gap: 4px; flex-wrap: wrap; }
     .nav-btn { padding: 6px 14px; font-size: 12px; font-weight: 500; background: none; border: 1px solid #222; border-radius: 4px; color: var(--gray-3); cursor: pointer; transition: all 0.15s; }
     .nav-btn:hover { border-color: #444; color: var(--white); }
     .nav-btn.active { border-color: var(--accent); color: var(--accent); }
+
     .admin-main { max-width: 960px; margin: 0 auto; padding: 40px 32px; display: flex; flex-direction: column; gap: 40px; }
 
-    /* Stats */
     .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
     .stat-card { background: #0d0d0d; padding: 20px 24px; }
     .stat-label { font-size: 10px; font-family: var(--mono); color: var(--gray-3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
     .stat-value { font-size: 26px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; }
 
-    /* Section */
     .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-3); padding-bottom: 12px; border-bottom: 1px solid #1a1a1a; }
     .card { background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 8px; padding: 28px; }
 
-    /* Form */
     .form-group { margin-bottom: 20px; }
     .form-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-3); margin-bottom: 8px; }
     .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 14px; background: #111; border: 1.5px solid #222; border-radius: 5px; color: var(--white); font-family: var(--font); font-size: 14px; outline: none; transition: border-color 0.15s; }
@@ -60,7 +55,6 @@
     .form-hint { font-size: 11px; color: var(--gray-3); margin-top: 6px; }
     .form-actions { display: flex; gap: 12px; align-items: center; margin-top: 24px; }
 
-    /* Buttons */
     .btn { padding: 11px 24px; border-radius: 5px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.15s; border: none; display: inline-flex; align-items: center; gap: 8px; }
     .btn-primary { background: var(--accent); color: white; }
     .btn-primary:hover { background: #b45309; }
@@ -70,14 +64,35 @@
     .btn-green { background: var(--green); color: white; font-size: 14px; padding: 14px 28px; }
     .btn-green:hover { background: #047857; }
     .btn-green:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-red { background: var(--red); color: white; }
+    .btn-red:hover { background: #b91c1c; }
+    .btn-red:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-    /* Scraper */
     .scraper-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
     .scraper-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
     .scraper-info p { font-size: 13px; color: var(--gray-3); line-height: 1.5; }
     #scraper-log { background: #060606; border: 1px solid #1a1a1a; border-radius: 5px; padding: 16px; font-family: var(--mono); font-size: 12px; line-height: 1.8; min-height: 60px; display: none; white-space: pre-wrap; }
     .progress-bar { height: 3px; background: #1a1a1a; border-radius: 2px; margin: 16px 0; overflow: hidden; display: none; }
     .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.5s ease; }
+
+    /* News list */
+    .news-list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .news-count { font-size: 12px; color: var(--gray-3); font-family: var(--mono); }
+    .news-list { display: flex; flex-direction: column; gap: 1px; background: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+    .news-item { background: #0d0d0d; padding: 14px 20px; display: flex; align-items: center; gap: 12px; transition: background 0.1s; }
+    .news-item:hover { background: #111; }
+    .news-item-cat { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: #1a1a1a; color: var(--gray-3); white-space: nowrap; }
+    .news-item-title { font-size: 13px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .news-item-meta { font-size: 11px; color: var(--gray-3); font-family: var(--mono); white-space: nowrap; }
+    .btn-delete { background: none; border: 1px solid #222; border-radius: 4px; color: #444; cursor: pointer; font-size: 12px; padding: 4px 8px; transition: all 0.15s; white-space: nowrap; }
+    .btn-delete:hover { border-color: var(--red); color: var(--red); background: rgba(220,38,38,0.08); }
+
+    .empty-state { padding: 40px; text-align: center; color: var(--gray-3); font-size: 13px; }
+
+    /* Danger zone */
+    .danger-zone { border: 1px solid rgba(220,38,38,0.3); border-radius: 8px; padding: 24px; background: rgba(220,38,38,0.05); }
+    .danger-title { font-size: 12px; font-weight: 700; color: var(--red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+    .danger-desc { font-size: 13px; color: var(--gray-3); margin-bottom: 16px; line-height: 1.5; }
 
     /* Cron */
     .cron-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
@@ -88,17 +103,15 @@
     .cron-option-desc { font-size: 11px; color: var(--gray-3); font-family: var(--mono); }
     .cron-current { font-size: 12px; color: var(--green); font-family: var(--mono); margin-bottom: 16px; }
 
-    /* News list */
-    .news-list { display: flex; flex-direction: column; gap: 1px; background: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
-    .news-item { background: #0d0d0d; padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
-    .news-item:hover { background: #111; }
-    .news-item-cat { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: #1a1a1a; color: var(--gray-3); white-space: nowrap; }
-    .news-item-title { font-size: 13px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .news-item-meta { font-size: 11px; color: var(--gray-3); font-family: var(--mono); white-space: nowrap; }
-    .empty-state { padding: 40px; text-align: center; color: var(--gray-3); font-size: 13px; }
+    /* Confirm dialog */
+    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; align-items: center; justify-content: center; }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: #0d0d0d; border: 1px solid #333; border-radius: 8px; padding: 32px; max-width: 400px; width: 90%; text-align: center; }
+    .confirm-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; }
+    .confirm-desc { font-size: 13px; color: var(--gray-3); margin-bottom: 24px; line-height: 1.5; }
+    .confirm-actions { display: flex; gap: 12px; justify-content: center; }
 
-    /* Toast */
-    .toast { position: fixed; bottom: 32px; right: 32px; padding: 14px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; display: none; align-items: center; gap: 10px; z-index: 999; }
+    .toast { position: fixed; bottom: 32px; right: 32px; padding: 14px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; display: none; align-items: center; gap: 10px; z-index: 9999; }
     .toast.show { display: flex; animation: slideIn 0.2s ease; }
     .toast.success { background: var(--green); color: white; }
     .toast.error { background: var(--red); color: white; }
@@ -121,7 +134,6 @@
     <input type="password" id="secret-input" placeholder="Introduce el secret..." />
     <button onclick="unlock()">Entrar</button>
   </div>
-  <div class="gate-error" id="gate-error">Secret incorrecto</div>
 </div>
 
 <div id="panel">
@@ -167,7 +179,7 @@
         <div class="scraper-top">
           <div class="scraper-info">
             <h3>Generar noticias ahora</h3>
-            <p>Busca noticias inmobiliarias reales en NewsAPI, las reescribe con Groq (Llama 3) y las publica automáticamente en la web.</p>
+            <p>Busca noticias inmobiliarias reales en NewsAPI, las reescribe con Groq (Llama 3) y las publica automáticamente con imagen.</p>
           </div>
           <button class="btn btn-green" id="btn-scrape" onclick="runScraper()">▶ Generar noticias</button>
         </div>
@@ -206,12 +218,18 @@
             <label class="form-label">Periodista</label>
             <select class="form-select" id="f-journalist">
               <option value="auto">Automático</option>
-              <option value="Borja Guiochea|BG">Borja Guiochea</option>
-              <option value="Leena Pérez|LP">Leena Pérez</option>
-              <option value="Valera Pausada|VP">Valera Pausada</option>
-              <option value="Paloma Regís|PR">Paloma Regís</option>
-              <option value="Adonis Vega|AV">Adonis Vega</option>
-              <option value="Lorenzo Aduga|LA">Lorenzo Aduga</option>
+              <option value="Carlos Mendoza|CM">Carlos Mendoza</option>
+              <option value="Elena Vázquez|EV">Elena Vázquez</option>
+              <option value="Javier Pardo|JP">Javier Pardo</option>
+              <option value="Sofía Herrera|SH">Sofía Herrera</option>
+              <option value="Marcos Iglesias|MI">Marcos Iglesias</option>
+              <option value="Ana Castellano|AC">Ana Castellano</option>
+              <option value="Pablo Serrano|PS">Pablo Serrano</option>
+              <option value="Laura Montero|LM">Laura Montero</option>
+              <option value="Ignacio Fuentes|IF">Ignacio Fuentes</option>
+              <option value="Marta Delgado|MD">Marta Delgado</option>
+              <option value="Rodrigo Alameda|RA">Rodrigo Alameda</option>
+              <option value="Cristina Llorente|CL">Cristina Llorente</option>
             </select>
           </div>
         </div>
@@ -224,7 +242,10 @@
 
     <!-- NOTICIAS -->
     <div id="tab-list" class="tab-content">
-      <div class="section-title">Noticias publicadas</div>
+      <div class="news-list-header">
+        <div class="section-title" style="border:none;padding:0;margin:0">Noticias publicadas</div>
+        <button class="btn btn-red" onclick="confirmClearAll()">🗑 Borrar todas</button>
+      </div>
       <div id="news-list-container"><div class="empty-state">Cargando...</div></div>
     </div>
 
@@ -233,7 +254,7 @@
       <div class="section-title">Programar actualizaciones automáticas</div>
       <div class="card">
         <p style="font-size:13px;color:var(--gray-3);margin-bottom:24px;line-height:1.6">
-          Elige cada cuánto quieres que el scraper publique noticias nuevas automáticamente. Copia el <code style="color:var(--accent)">vercel.json</code> generado y súbelo a GitHub para aplicar el cambio.
+          Elige cada cuánto quieres que el scraper publique noticias nuevas. Copia el <code style="color:var(--accent)">vercel.json</code> generado y súbelo a GitHub.
         </p>
         <div class="cron-grid">
           <div class="cron-option" onclick="selectCron('0 */6 * * *', this)">
@@ -250,35 +271,43 @@
           </div>
           <div class="cron-option" onclick="selectCron('0 7,19 * * *', this)">
             <div class="cron-option-title">Dos veces al día</div>
-            <div class="cron-option-desc">0 7,19 * * * &nbsp;(7AM y 7PM)</div>
+            <div class="cron-option-desc">0 7,19 * * *</div>
           </div>
           <div class="cron-option" onclick="selectCron('0 7 * * 1-5', this)">
             <div class="cron-option-title">Días laborables</div>
-            <div class="cron-option-desc">0 7 * * 1-5 &nbsp;(Lun–Vie 7AM)</div>
+            <div class="cron-option-desc">0 7 * * 1-5</div>
           </div>
           <div class="cron-option" onclick="selectCron('custom', this)">
             <div class="cron-option-title">Personalizado</div>
             <div class="cron-option-desc">Introduce tu expresión cron</div>
           </div>
         </div>
-
         <div id="custom-input-box" style="display:none;margin-bottom:20px;padding:16px;background:#111;border:1.5px solid #222;border-radius:6px">
           <div class="form-label">Expresión cron personalizada</div>
           <input class="form-input" id="custom-cron-input" placeholder="ej: 0 8 * * *" style="font-family:var(--mono);margin-top:8px" oninput="onCustomCron(this.value)" />
-          <div class="form-hint" style="margin-top:8px">Formato: minuto hora día mes día_semana &nbsp;·&nbsp; <a href="https://crontab.guru" target="_blank" style="color:var(--accent)">crontab.guru</a></div>
+          <div class="form-hint" style="margin-top:8px"><a href="https://crontab.guru" target="_blank" style="color:var(--accent)">crontab.guru</a> — generador de expresiones cron</div>
         </div>
-
         <div class="cron-current" id="cron-preview"></div>
-
         <div style="background:#060606;border:1px solid #1a1a1a;border-radius:6px;padding:16px;margin-bottom:20px">
           <div style="font-size:10px;color:var(--gray-3);font-family:var(--mono);letter-spacing:0.1em;margin-bottom:10px">VERCEL.JSON — COPIA Y SUBE A GITHUB</div>
           <pre id="vercel-json-preview" style="font-family:var(--mono);font-size:12px;color:#ccc;white-space:pre-wrap"></pre>
         </div>
-
         <button class="btn btn-primary" onclick="copyCronJson()">Copiar vercel.json</button>
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- Confirm dialog -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">¿Estás seguro?</div>
+    <div class="confirm-desc" id="confirm-desc">Esta acción no se puede deshacer.</div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-red" id="confirm-ok" onclick="executeConfirm()">Eliminar</button>
+    </div>
   </div>
 </div>
 
@@ -287,6 +316,7 @@
 <script>
   let SECRET = '';
   let selectedCron = '0 7 * * *';
+  let confirmCallback = null;
 
   const urlSecret = new URLSearchParams(window.location.search).get('secret');
   if (urlSecret) { SECRET = urlSecret; initPanel(); }
@@ -330,6 +360,7 @@
     } catch {}
   }
 
+  // ── SCRAPER ──────────────────────────────────────────────
   async function runScraper() {
     const btn = document.getElementById('btn-scrape');
     const log = document.getElementById('scraper-log');
@@ -347,11 +378,9 @@
     await sleep(800);
     log.textContent += '⟳ Buscando noticias inmobiliarias...\n';
     fill.style.width = '35%';
-
     await sleep(1500);
     log.textContent += '⟳ Reescribiendo con Groq (Llama 3)...\n';
     fill.style.width = '65%';
-
     await sleep(3000);
     log.textContent += '⟳ Guardando en base de datos...\n';
     fill.style.width = '85%';
@@ -375,7 +404,7 @@
         loadStats();
       } else if (data.status === 'no_content') {
         log.style.color = '#f59e0b';
-        log.textContent = '⚠ No se encontraron noticias nuevas en este momento.\n\nPrueba más tarde o añade una manualmente desde la pestaña ✏️ Añadir.';
+        log.textContent = '⚠ No se encontraron noticias nuevas.\n\nPrueba más tarde o añade una manualmente.';
       } else {
         log.style.color = 'var(--red)';
         log.textContent = '✗ Error: ' + (data.message || JSON.stringify(data));
@@ -383,13 +412,14 @@
     } catch (err) {
       bar.style.display = 'none';
       log.style.color = 'var(--red)';
-      log.textContent = '✗ Error de conexión: ' + err.message;
+      log.textContent = '✗ Error: ' + err.message;
     }
 
     btn.disabled = false;
     btn.innerHTML = '▶ Generar noticias';
   }
 
+  // ── AÑADIR NOTICIA ────────────────────────────────────────
   async function publishArticle() {
     const title   = document.getElementById('f-title').value.trim();
     const excerpt = document.getElementById('f-excerpt').value.trim();
@@ -404,20 +434,25 @@
     btn.innerHTML = '<span class="spinner"></span> Publicando...';
 
     const jMap = {
-      'Mercado':['Leena Pérez','LP'], 'Inversión':['Borja Guiochea','BG'],
-      'Residencial':['Lorenzo Aduga','LA'], 'Oficinas':['Leena Pérez','LP'],
-      'Regulación':['Valera Pausada','VP'], 'Logística':['Paloma Regís','PR'],
-      'SOCIMIs':['Borja Guiochea','BG'], 'Proptech':['Adonis Vega','AV'],
-      'Comercial':['Paloma Regís','PR'], 'Hotelero':['Borja Guiochea','BG'],
+      'Mercado':['Elena Vázquez','EV'], 'Inversión':['Carlos Mendoza','CM'],
+      'Residencial':['Ana Castellano','AC'], 'Oficinas':['Laura Montero','LM'],
+      'Regulación':['Javier Pardo','JP'], 'Logística':['Rodrigo Alameda','RA'],
+      'SOCIMIs':['Ignacio Fuentes','IF'], 'Proptech':['Marcos Iglesias','MI'],
+      'Comercial':['Sofía Herrera','SH'], 'Hotelero':['Pablo Serrano','PS'],
     };
 
     let journalist, initials;
-    if (jVal === 'auto') { [journalist, initials] = jMap[cat] || ['Borja Guiochea','BG']; }
+    if (jVal === 'auto') { [journalist, initials] = jMap[cat] || ['Carlos Mendoza','CM']; }
     else { [journalist, initials] = jVal.split('|'); }
 
+    const id = Date.now().toString(36) + Math.random().toString(36).substr(2,6);
+    const PICSUM_IDS = { 'Residencial':[164,323,431], 'Oficinas':[1029,1040,1060], 'Inversión':[256,265,275], 'Regulación':[208,210,212], 'Mercado':[371,377,383], 'Logística':[325,327,329], 'SOCIMIs':[240,242,244], 'Proptech':[0,2,4], 'Comercial':[180,182,184], 'Hotelero':[400,402,404] };
+    const ids = PICSUM_IDS[cat] || [350,352,354];
+    const imgId = ids[Math.floor(Math.random() * ids.length)];
+
     const article = {
-      id: Date.now().toString(36) + Math.random().toString(36).substr(2,6),
-      title, excerpt, body: body || excerpt, category: cat,
+      id, title, excerpt, body: body || excerpt, category: cat,
+      image: 'https://picsum.photos/id/' + imgId + '/800/450',
       journalist, journalistInitials: initials,
       publishedAt: new Date().toISOString(),
     };
@@ -448,23 +483,85 @@
     document.getElementById('f-journalist').value = 'auto';
   }
 
+  // ── LISTA NOTICIAS ────────────────────────────────────────
   async function loadNewsList() {
     const c = document.getElementById('news-list-container');
     c.innerHTML = '<div class="empty-state">Cargando...</div>';
     try {
       const res = await fetch('/api/news?limit=60');
       const data = await res.json();
-      if (!data.articles?.length) { c.innerHTML = '<div class="empty-state">No hay noticias publicadas.</div>'; return; }
+      if (!data.articles?.length) {
+        c.innerHTML = '<div class="empty-state">No hay noticias publicadas.</div>';
+        return;
+      }
       c.innerHTML = '<div class="news-list">' + data.articles.map(a =>
-        '<div class="news-item">' +
+        '<div class="news-item" id="item-' + a.id + '">' +
         '<span class="news-item-cat">' + a.category + '</span>' +
         '<span class="news-item-title">' + escHtml(a.title) + '</span>' +
         '<span class="news-item-meta">' + timeAgo(a.publishedAt) + '</span>' +
+        '<button class="btn-delete" onclick="confirmDelete(\'' + a.id + '\', \'' + escHtml(a.title).substring(0,40) + '...\')">✕ Eliminar</button>' +
         '</div>'
       ).join('') + '</div>';
     } catch { c.innerHTML = '<div class="empty-state">Error al cargar.</div>'; }
   }
 
+  // ── ELIMINAR ──────────────────────────────────────────────
+  function confirmDelete(id, title) {
+    document.getElementById('confirm-title').textContent = 'Eliminar noticia';
+    document.getElementById('confirm-desc').textContent = '¿Eliminar "' + title + '"? Esta acción no se puede deshacer.';
+    document.getElementById('confirm-ok').textContent = 'Eliminar';
+    confirmCallback = () => deleteNews(id);
+    document.getElementById('confirm-overlay').classList.add('open');
+  }
+
+  function confirmClearAll() {
+    document.getElementById('confirm-title').textContent = 'Borrar todas las noticias';
+    document.getElementById('confirm-desc').textContent = 'Se eliminarán todas las noticias de la web. Esta acción no se puede deshacer.';
+    document.getElementById('confirm-ok').textContent = 'Borrar todo';
+    confirmCallback = () => clearAllNews();
+    document.getElementById('confirm-overlay').classList.add('open');
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('open');
+    confirmCallback = null;
+  }
+
+  function executeConfirm() {
+    closeConfirm();
+    if (confirmCallback) confirmCallback();
+  }
+
+  async function deleteNews(id) {
+    try {
+      const res = await fetch('/api/delete-news?secret=' + SECRET + '&id=' + id, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.status === 'success') {
+        showToast('✓ Noticia eliminada', 'success');
+        const el = document.getElementById('item-' + id);
+        if (el) el.remove();
+        loadStats();
+      } else {
+        showToast('Error: ' + (data.message || 'desconocido'), 'error');
+      }
+    } catch { showToast('Error de conexión', 'error'); }
+  }
+
+  async function clearAllNews() {
+    try {
+      const res = await fetch('/api/delete-news?secret=' + SECRET + '&all=true', { method: 'DELETE' });
+      const data = await res.json();
+      if (data.status === 'success') {
+        showToast('✓ Todas las noticias eliminadas', 'success');
+        loadNewsList();
+        loadStats();
+      } else {
+        showToast('Error: ' + (data.message || 'desconocido'), 'error');
+      }
+    } catch { showToast('Error de conexión', 'error'); }
+  }
+
+  // ── CRON ──────────────────────────────────────────────────
   function selectCron(cron, el) {
     document.querySelectorAll('.cron-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
@@ -479,34 +576,24 @@
     updateCronPreview();
   }
 
-  function onCustomCron(val) {
-    selectedCron = val || '0 7 * * *';
-    updateCronPreview();
-  }
+  function onCustomCron(val) { selectedCron = val || '0 7 * * *'; updateCronPreview(); }
 
   function updateCronPreview() {
     document.getElementById('cron-preview').textContent = '✓ Seleccionado: ' + selectedCron;
     const json = {
       crons: [{ path: "/api/scrape", schedule: selectedCron }],
-      functions: {
-        "api/scrape.js": { maxDuration: 60 },
-        "api/news.js": { maxDuration: 10 },
-        "api/data.js": { maxDuration: 30 },
-        "api/add-news.js": { maxDuration: 10 }
-      },
-      rewrites: [
-        { source: "/admin", destination: "/admin.html" },
-        { source: "/", destination: "/index.html" }
-      ]
+      functions: { "api/scrape.js": { maxDuration: 60 }, "api/news.js": { maxDuration: 10 }, "api/data.js": { maxDuration: 30 }, "api/add-news.js": { maxDuration: 10 }, "api/delete-news.js": { maxDuration: 10 } },
+      rewrites: [{ source: "/admin", destination: "/admin.html" }, { source: "/", destination: "/index.html" }]
     };
     document.getElementById('vercel-json-preview').textContent = JSON.stringify(json, null, 2);
   }
 
   function copyCronJson() {
-    const text = document.getElementById('vercel-json-preview').textContent;
-    navigator.clipboard.writeText(text).then(() => showToast('✓ Copiado — pégalo en built-digest/vercel.json en GitHub', 'info'));
+    navigator.clipboard.writeText(document.getElementById('vercel-json-preview').textContent)
+      .then(() => showToast('✓ Copiado — pégalo en built-digest/vercel.json en GitHub', 'info'));
   }
 
+  // ── HELPERS ───────────────────────────────────────────────
   function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg;
