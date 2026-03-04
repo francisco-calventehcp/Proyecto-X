@@ -1,4 +1,12 @@
-const { getNews, saveNews, clearAll } = require("../lib/storage");
+const { Redis } = require("@upstash/redis");
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
+});
+
+const NEWS_KEY = "built-digest:news";
+const META_KEY = "built-digest:meta";
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -19,36 +27,29 @@ module.exports = async function handler(req, res) {
   try {
     // ?all=true → borra todo
     if (req.query.all === "true") {
-      await clearAll();
-      return res.status(200).json({ status: "success", message: "Todas las noticias eliminadas" });
+      await redis.del(NEWS_KEY);
+      await redis.del(META_KEY);
+      return res.status(200).json({ status: "success", message: "Todas las noticias eliminadas", total: 0 });
     }
 
-    // ?id=xxx → borra una noticia
+    // ?id=xxx → borra una noticia concreta
     const { id } = req.query;
     if (!id) {
       return res.status(400).json({ error: "Falta el parámetro id o all=true" });
     }
 
-    const { articles } = await getNews({ limit: 60 });
+    const articles = (await redis.get(NEWS_KEY)) || [];
     const filtered = articles.filter(a => a.id !== id);
 
     if (filtered.length === articles.length) {
       return res.status(404).json({ error: "Noticia no encontrada" });
     }
 
-    await saveNews(filtered.map(a => ({ ...a, _skipDedupe: true })));
-
-    // Guardar directamente sin deduplicar
-    const { Redis } = require("@upstash/redis");
-    const redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN,
-    });
-    await redis.set("built-digest:news", filtered);
+    await redis.set(NEWS_KEY, filtered);
 
     return res.status(200).json({
       status: "success",
-      message: `Noticia ${id} eliminada`,
+      message: `Noticia eliminada`,
       total: filtered.length,
     });
 
