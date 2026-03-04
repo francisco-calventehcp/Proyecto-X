@@ -534,7 +534,7 @@
 
   async function deleteNews(id) {
     try {
-      const res = await fetch('/api/delete-news?secret=' + SECRET + '&id=' + id, { method: 'DELETE' });
+      const res = await fetch('/api/delete-news?secret=' + SECRET + '&id=' + id);
       const data = await res.json();
       if (data.status === 'success') {
         showToast('✓ Noticia eliminada', 'success');
@@ -549,7 +549,7 @@
 
   async function clearAllNews() {
     try {
-      const res = await fetch('/api/delete-news?secret=' + SECRET + '&all=true', { method: 'DELETE' });
+      const res = await fetch('/api/delete-news?secret=' + SECRET + '&all=true');
       const data = await res.json();
       if (data.status === 'success') {
         showToast('✓ Todas las noticias eliminadas', 'success');
