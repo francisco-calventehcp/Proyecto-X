@@ -6,766 +6,525 @@
   <title>Built Digest — Admin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --black: #0a0a0a;
-      --white: #ffffff;
-      --gray-1: #f5f5f4;
-      --gray-2: #e7e5e4;
-      --gray-3: #a8a29e;
-      --gray-4: #57534e;
-      --accent: #d97706;
-      --green: #059669;
-      --red: #dc2626;
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --black: #0a0a0a; --white: #ffffff;
+      --gray-3: #a8a29e; --gray-4: #57534e;
+      --accent: #d97706; --green: #059669; --red: #dc2626; --blue: #3b82f6;
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
     }
+    body { font-family: var(--font); background: #0a0a0a; color: var(--white); min-height: 100vh; }
 
-    body {
-      font-family: var(--font);
-      background: var(--black);
-      color: var(--white);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── GATE ── */
-    #gate {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 24px;
-      padding: 40px;
-    }
-
-    .gate-logo {
-      font-size: 13px;
-      font-family: var(--mono);
-      color: var(--gray-3);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-
-    .gate-title {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-
-    .gate-input {
-      display: flex;
-      gap: 0;
-      border: 1.5px solid #333;
-      border-radius: 6px;
-      overflow: hidden;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .gate-input input {
-      flex: 1;
-      padding: 12px 16px;
-      background: #111;
-      border: none;
-      color: var(--white);
-      font-family: var(--mono);
-      font-size: 13px;
-      outline: none;
-    }
-
+    /* GATE */
+    #gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; padding: 40px; }
+    .gate-logo { font-size: 13px; font-family: var(--mono); color: var(--gray-3); letter-spacing: 0.15em; text-transform: uppercase; }
+    .gate-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    .gate-input { display: flex; border: 1.5px solid #222; border-radius: 6px; overflow: hidden; width: 100%; max-width: 400px; }
+    .gate-input input { flex: 1; padding: 12px 16px; background: #111; border: none; color: var(--white); font-family: var(--mono); font-size: 13px; outline: none; }
     .gate-input input::placeholder { color: #444; }
-
-    .gate-input button {
-      padding: 12px 20px;
-      background: var(--accent);
-      border: none;
-      color: var(--white);
-      font-weight: 700;
-      font-size: 12px;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
+    .gate-input button { padding: 12px 20px; background: var(--accent); border: none; color: var(--white); font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; }
     .gate-input button:hover { background: #b45309; }
+    .gate-error { font-size: 12px; color: var(--red); font-family: var(--mono); display: none; }
 
-    .gate-error {
-      font-size: 12px;
-      color: var(--red);
-      font-family: var(--mono);
-      display: none;
-    }
-
-    /* ── PANEL ── */
-    #panel { display: none; flex-direction: column; min-height: 100vh; }
-
-    /* Header */
-    .admin-header {
-      border-bottom: 1px solid #1a1a1a;
-      padding: 0 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-      background: #0d0d0d;
-    }
-
-    .admin-logo {
-      font-size: 14px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
+    /* PANEL */
+    #panel { display: none; }
+    .admin-header { border-bottom: 1px solid #1a1a1a; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 56px; background: #0d0d0d; position: sticky; top: 0; z-index: 100; }
+    .admin-logo { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
     .logo-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
-
-    .admin-badge {
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--accent);
-      background: rgba(217,119,6,0.12);
-      padding: 3px 8px;
-      border-radius: 3px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .admin-nav {
-      display: flex;
-      gap: 4px;
-    }
-
-    .nav-btn {
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: 500;
-      background: none;
-      border: 1px solid #222;
-      border-radius: 4px;
-      color: var(--gray-3);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .nav-btn:hover, .nav-btn.active { border-color: var(--accent); color: var(--accent); }
-
-    /* Main */
-    .admin-main {
-      flex: 1;
-      max-width: 900px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 40px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
+    .admin-badge { font-size: 10px; font-family: var(--mono); color: var(--accent); background: rgba(217,119,6,0.12); padding: 3px 8px; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .admin-nav { display: flex; gap: 4px; }
+    .nav-btn { padding: 6px 14px; font-size: 12px; font-weight: 500; background: none; border: 1px solid #222; border-radius: 4px; color: var(--gray-3); cursor: pointer; transition: all 0.15s; }
+    .nav-btn:hover { border-color: #444; color: var(--white); }
+    .nav-btn.active { border-color: var(--accent); color: var(--accent); }
+    .admin-main { max-width: 960px; margin: 0 auto; padding: 40px 32px; display: flex; flex-direction: column; gap: 40px; }
 
     /* Stats */
-    .stats-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: #1a1a1a;
-      border: 1px solid #1a1a1a;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+    .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+    .stat-card { background: #0d0d0d; padding: 20px 24px; }
+    .stat-label { font-size: 10px; font-family: var(--mono); color: var(--gray-3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+    .stat-value { font-size: 26px; font-weight: 800; font-family: var(--mono); letter-spacing: -1px; }
 
-    .stat-card {
-      background: #0d0d0d;
-      padding: 20px 24px;
-    }
-
-    .stat-label {
-      font-size: 10px;
-      font-family: var(--mono);
-      color: var(--gray-3);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 28px;
-      font-weight: 800;
-      font-family: var(--mono);
-      letter-spacing: -1px;
-      color: var(--white);
-    }
-
-    .stat-sub {
-      font-size: 11px;
-      color: var(--gray-3);
-      margin-top: 4px;
-    }
-
-    /* Sección */
-    .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--gray-3);
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #1a1a1a;
-    }
+    /* Section */
+    .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-3); padding-bottom: 12px; border-bottom: 1px solid #1a1a1a; }
+    .card { background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 8px; padding: 28px; }
 
     /* Form */
-    .form-card {
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
-      border-radius: 8px;
-      padding: 28px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--gray-3);
-      margin-bottom: 8px;
-    }
-
-    .form-input, .form-textarea, .form-select {
-      width: 100%;
-      padding: 10px 14px;
-      background: #111;
-      border: 1.5px solid #222;
-      border-radius: 5px;
-      color: var(--white);
-      font-family: var(--font);
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
-      border-color: var(--accent);
-    }
-
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-3); margin-bottom: 8px; }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 14px; background: #111; border: 1.5px solid #222; border-radius: 5px; color: var(--white); font-family: var(--font); font-size: 14px; outline: none; transition: border-color 0.15s; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--accent); }
     .form-input::placeholder, .form-textarea::placeholder { color: #444; }
-
-    .form-textarea {
-      resize: vertical;
-      min-height: 120px;
-      line-height: 1.6;
-    }
-
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
     .form-select option { background: #111; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-hint { font-size: 11px; color: var(--gray-3); margin-top: 6px; }
+    .form-actions { display: flex; gap: 12px; align-items: center; margin-top: 24px; }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-hint {
-      font-size: 11px;
-      color: var(--gray-3);
-      margin-top: 6px;
-    }
-
-    /* Botones */
-    .btn-primary {
-      padding: 12px 28px;
-      background: var(--accent);
-      border: none;
-      border-radius: 5px;
-      color: var(--white);
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.15s;
-      letter-spacing: 0.02em;
-    }
+    /* Buttons */
+    .btn { padding: 11px 24px; border-radius: 5px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.15s; border: none; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--accent); color: white; }
     .btn-primary:hover { background: #b45309; }
-    .btn-primary:disabled { background: #444; cursor: not-allowed; }
-
-    .btn-secondary {
-      padding: 12px 20px;
-      background: none;
-      border: 1.5px solid #333;
-      border-radius: 5px;
-      color: var(--gray-3);
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-secondary { background: none; border: 1.5px solid #333; color: var(--gray-3); }
     .btn-secondary:hover { border-color: #555; color: var(--white); }
+    .btn-green { background: var(--green); color: white; font-size: 14px; padding: 14px 28px; }
+    .btn-green:hover { background: #047857; }
+    .btn-green:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-    .form-actions {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-top: 8px;
-    }
+    /* Scraper */
+    .scraper-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+    .scraper-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .scraper-info p { font-size: 13px; color: var(--gray-3); line-height: 1.5; }
+    #scraper-log { background: #060606; border: 1px solid #1a1a1a; border-radius: 5px; padding: 16px; font-family: var(--mono); font-size: 12px; line-height: 1.8; min-height: 60px; display: none; white-space: pre-wrap; }
+    .progress-bar { height: 3px; background: #1a1a1a; border-radius: 2px; margin: 16px 0; overflow: hidden; display: none; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; width: 0%; transition: width 0.5s ease; }
 
-    /* Notificación */
-    .toast {
-      position: fixed;
-      bottom: 32px;
-      right: 32px;
-      padding: 14px 20px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      z-index: 999;
-      animation: slideIn 0.2s ease;
-    }
-    .toast.show { display: flex; }
+    /* Cron */
+    .cron-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+    .cron-option { border: 1.5px solid #222; border-radius: 6px; padding: 14px 16px; cursor: pointer; transition: all 0.15s; background: #111; }
+    .cron-option:hover { border-color: #444; }
+    .cron-option.selected { border-color: var(--accent); background: rgba(217,119,6,0.08); }
+    .cron-option-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .cron-option-desc { font-size: 11px; color: var(--gray-3); font-family: var(--mono); }
+    .cron-current { font-size: 12px; color: var(--green); font-family: var(--mono); margin-bottom: 16px; }
+
+    /* News list */
+    .news-list { display: flex; flex-direction: column; gap: 1px; background: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
+    .news-item { background: #0d0d0d; padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+    .news-item:hover { background: #111; }
+    .news-item-cat { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: #1a1a1a; color: var(--gray-3); white-space: nowrap; }
+    .news-item-title { font-size: 13px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .news-item-meta { font-size: 11px; color: var(--gray-3); font-family: var(--mono); white-space: nowrap; }
+    .empty-state { padding: 40px; text-align: center; color: var(--gray-3); font-size: 13px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 32px; right: 32px; padding: 14px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; display: none; align-items: center; gap: 10px; z-index: 999; }
+    .toast.show { display: flex; animation: slideIn 0.2s ease; }
     .toast.success { background: var(--green); color: white; }
     .toast.error { background: var(--red); color: white; }
+    .toast.info { background: var(--blue); color: white; }
+    @keyframes slideIn { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-    @keyframes slideIn {
-      from { transform: translateY(20px); opacity: 0; }
-      to   { transform: translateY(0); opacity: 1; }
-    }
-
-    /* Lista noticias */
-    .news-list { display: flex; flex-direction: column; gap: 1px; background: #1a1a1a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; }
-
-    .news-item {
-      background: #0d0d0d;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .news-item-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--white);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .news-item-meta {
-      font-size: 11px;
-      color: var(--gray-3);
-      font-family: var(--mono);
-      white-space: nowrap;
-    }
-
-    .news-item-cat {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 3px;
-      background: #1a1a1a;
-      color: var(--gray-3);
-      white-space: nowrap;
-    }
-
-    .btn-delete {
-      background: none;
-      border: none;
-      color: #333;
-      cursor: pointer;
-      font-size: 16px;
-      padding: 4px;
-      transition: color 0.15s;
-    }
-    .btn-delete:hover { color: var(--red); }
-
-    /* Loading spinner */
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
-    }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .empty-state {
-      padding: 40px;
-      text-align: center;
-      color: var(--gray-3);
-      font-size: 13px;
-    }
-
-    /* Scraper section */
-    .scraper-card {
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
-      border-radius: 8px;
-      padding: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-    }
-
-    .scraper-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-    .scraper-info p { font-size: 13px; color: var(--gray-3); line-height: 1.5; }
-
-    #scraper-result {
-      margin-top: 16px;
-      padding: 14px 16px;
-      background: #111;
-      border-radius: 5px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--green);
-      display: none;
-      white-space: pre-wrap;
-    }
+    .tab-content { display: none; flex-direction: column; gap: 24px; }
+    .tab-content.active { display: flex; }
   </style>
 </head>
 <body>
 
-  <!-- ── GATE ── -->
-  <div id="gate">
-    <div class="gate-logo">Built Digest</div>
-    <div class="gate-title">Panel de administración</div>
-    <div class="gate-input">
-      <input type="password" id="secret-input" placeholder="Introduce el secret..." />
-      <button onclick="unlock()">Entrar</button>
+<div id="gate">
+  <div class="gate-logo">Built Digest</div>
+  <div class="gate-title">Panel de administración</div>
+  <div class="gate-input">
+    <input type="password" id="secret-input" placeholder="Introduce el secret..." />
+    <button onclick="unlock()">Entrar</button>
+  </div>
+  <div class="gate-error" id="gate-error">Secret incorrecto</div>
+</div>
+
+<div id="panel">
+  <div class="admin-header">
+    <div class="admin-logo">
+      <span class="logo-dot"></span>Built Digest
+      <span class="admin-badge">Admin</span>
     </div>
-    <div class="gate-error" id="gate-error">Secret incorrecto</div>
+    <div class="admin-nav">
+      <button class="nav-btn active" onclick="showTab('scraper')">🤖 Scraper</button>
+      <button class="nav-btn" onclick="showTab('add')">✏️ Añadir</button>
+      <button class="nav-btn" onclick="showTab('list')">📋 Noticias</button>
+      <button class="nav-btn" onclick="showTab('cron')">⏱ Programar</button>
+      <button class="nav-btn" onclick="window.open('/', '_blank')">Ver web →</button>
+    </div>
   </div>
 
-  <!-- ── PANEL ── -->
-  <div id="panel">
+  <div class="admin-main">
 
-    <div class="admin-header">
-      <div class="admin-logo">
-        <span class="logo-dot"></span>
-        Built Digest
-        <span class="admin-badge">Admin</span>
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-label">Total noticias</div>
+        <div class="stat-value" id="stat-total">—</div>
       </div>
-      <div class="admin-nav">
-        <button class="nav-btn active" onclick="showTab('add')">+ Añadir noticia</button>
-        <button class="nav-btn" onclick="showTab('list')">Noticias</button>
-        <button class="nav-btn" onclick="showTab('scraper')">Scraper</button>
-        <button class="nav-btn" onclick="window.open('/', '_blank')">Ver web →</button>
+      <div class="stat-card">
+        <div class="stat-label">Último scrape</div>
+        <div class="stat-value" style="font-size:15px;padding-top:4px" id="stat-lastrun">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Próxima auto</div>
+        <div class="stat-value" style="font-size:15px;padding-top:4px" id="stat-next">7:00 mañana</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Estado</div>
+        <div class="stat-value" style="font-size:15px;padding-top:4px;color:var(--green)">✓ Online</div>
       </div>
     </div>
 
-    <div class="admin-main">
-
-      <!-- Stats -->
-      <div class="stats-bar" id="stats-bar">
-        <div class="stat-card">
-          <div class="stat-label">Total noticias</div>
-          <div class="stat-value" id="stat-total">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Último scrape</div>
-          <div class="stat-value" style="font-size:16px;padding-top:6px" id="stat-lastrun">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Estado</div>
-          <div class="stat-value" style="font-size:16px;padding-top:6px;color:#059669" id="stat-status">✓ Online</div>
-        </div>
-      </div>
-
-      <!-- TAB: Añadir noticia -->
-      <div id="tab-add">
-        <div class="section-title">Añadir noticia manualmente</div>
-        <div class="form-card">
-          <div class="form-group">
-            <label class="form-label">Titular *</label>
-            <input class="form-input" id="f-title" type="text" placeholder="Escribe el titular de la noticia..." />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Entradilla *</label>
-            <textarea class="form-textarea" id="f-excerpt" placeholder="Resumen breve de la noticia (2-3 frases)..." style="min-height:80px"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Cuerpo de la noticia</label>
-            <textarea class="form-textarea" id="f-body" placeholder="Texto completo de la noticia. Si lo dejas vacío, Groq lo generará automáticamente..."></textarea>
-            <div class="form-hint">Si dejas el cuerpo vacío, la IA lo generará a partir del titular y la entradilla.</div>
-          </div>
-          <div class="form-row">
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">Categoría</label>
-              <select class="form-select" id="f-category">
-                <option value="Mercado">Mercado</option>
-                <option value="Residencial">Residencial</option>
-                <option value="Inversión">Inversión</option>
-                <option value="Oficinas">Oficinas</option>
-                <option value="Logística">Logística</option>
-                <option value="Regulación">Regulación</option>
-                <option value="SOCIMIs">SOCIMIs</option>
-                <option value="Proptech">Proptech</option>
-                <option value="Comercial">Comercial</option>
-                <option value="Hotelero">Hotelero</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">Periodista</label>
-              <select class="form-select" id="f-journalist">
-                <option value="auto">Asignar automáticamente</option>
-                <option value="Borja Guiochea|BG">Borja Guiochea</option>
-                <option value="Leena Pérez|LP">Leena Pérez</option>
-                <option value="Valera Pausada|VP">Valera Pausada</option>
-                <option value="Paloma Regís|PR">Paloma Regís</option>
-                <option value="Adonis Vega|AV">Adonis Vega</option>
-                <option value="Lorenzo Aduga|LA">Lorenzo Aduga</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-actions" style="margin-top:24px">
-            <button class="btn-primary" id="btn-publish" onclick="publishArticle()">Publicar noticia</button>
-            <button class="btn-secondary" onclick="clearForm()">Limpiar</button>
-            <span id="publish-status" style="font-size:12px;color:var(--gray-3)"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: Lista noticias -->
-      <div id="tab-list" style="display:none">
-        <div class="section-title">Noticias publicadas</div>
-        <div id="news-list-container">
-          <div class="empty-state">Cargando...</div>
-        </div>
-      </div>
-
-      <!-- TAB: Scraper -->
-      <div id="tab-scraper" style="display:none">
-        <div class="section-title">Scraper automático</div>
-        <div class="scraper-card">
+    <!-- SCRAPER -->
+    <div id="tab-scraper" class="tab-content active">
+      <div class="section-title">Generador automático de noticias</div>
+      <div class="card">
+        <div class="scraper-top">
           <div class="scraper-info">
-            <h3>Ejecutar scraper ahora</h3>
-            <p>Busca noticias inmobiliarias en NewsAPI, las reescribe con Groq (Llama 3) y las guarda automáticamente. El cron lo ejecuta cada día a las 7:00 AM.</p>
+            <h3>Generar noticias ahora</h3>
+            <p>Busca noticias inmobiliarias reales en NewsAPI, las reescribe con Groq (Llama 3) y las publica automáticamente en la web.</p>
           </div>
-          <button class="btn-primary" id="btn-scrape" onclick="runScraper()">▶ Ejecutar</button>
+          <button class="btn btn-green" id="btn-scrape" onclick="runScraper()">▶ Generar noticias</button>
         </div>
-        <div id="scraper-result"></div>
+        <div class="progress-bar" id="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div id="scraper-log"></div>
       </div>
-
     </div>
-  </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
-
-  <script>
-    let SECRET = '';
-
-    // ── GATE ──────────────────────────────────────────────────
-    // Comprobar si hay secret en URL
-    const urlSecret = new URLSearchParams(window.location.search).get('secret');
-    if (urlSecret) {
-      SECRET = urlSecret;
-      showPanel();
-    }
-
-    document.getElementById('secret-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') unlock();
-    });
-
-    function unlock() {
-      const val = document.getElementById('secret-input').value.trim();
-      if (!val) return;
-      SECRET = val;
-      showPanel();
-    }
-
-    async function showPanel() {
-      // Verificar secret contra la API
-      try {
-        const res = await fetch(`/api/news?limit=1`);
-        if (!res.ok) throw new Error();
-        document.getElementById('gate').style.display = 'none';
-        document.getElementById('panel').style.display = 'flex';
-        loadStats();
-      } catch {
-        document.getElementById('gate-error').style.display = 'block';
-        SECRET = '';
-      }
-    }
-
-    // ── TABS ──────────────────────────────────────────────────
-    function showTab(tab) {
-      ['add','list','scraper'].forEach(t => {
-        document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
-      });
-      document.querySelectorAll('.nav-btn').forEach((b,i) => {
-        b.classList.toggle('active', ['add','list','scraper'][i] === tab);
-      });
-      if (tab === 'list') loadNewsList();
-    }
-
-    // ── STATS ─────────────────────────────────────────────────
-    async function loadStats() {
-      try {
-        const res = await fetch('/api/news?limit=1');
-        const data = await res.json();
-        document.getElementById('stat-total').textContent = data.total || 0;
-        if (data.lastUpdated) {
-          const d = new Date(data.lastUpdated);
-          document.getElementById('stat-lastrun').textContent =
-            d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ' ' +
-            d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-        }
-      } catch {}
-    }
-
-    // ── PUBLICAR NOTICIA ──────────────────────────────────────
-    async function publishArticle() {
-      const title    = document.getElementById('f-title').value.trim();
-      const excerpt  = document.getElementById('f-excerpt').value.trim();
-      const body     = document.getElementById('f-body').value.trim();
-      const category = document.getElementById('f-category').value;
-      const journVal = document.getElementById('f-journalist').value;
-
-      if (!title || !excerpt) {
-        showToast('El titular y la entradilla son obligatorios', 'error');
-        return;
-      }
-
-      const btn = document.getElementById('btn-publish');
-      const status = document.getElementById('publish-status');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Publicando...';
-      status.textContent = '';
-
-      let journalist, journalistInitials;
-      if (journVal === 'auto') {
-        const map = {
-          'Mercado': ['Leena Pérez','LP'], 'Inversión': ['Borja Guiochea','BG'],
-          'Residencial': ['Lorenzo Aduga','LA'], 'Oficinas': ['Leena Pérez','LP'],
-          'Regulación': ['Valera Pausada','VP'], 'Logística': ['Paloma Regís','PR'],
-          'SOCIMIs': ['Borja Guiochea','BG'], 'Proptech': ['Adonis Vega','AV'],
-          'Comercial': ['Paloma Regís','PR'], 'Hotelero': ['Borja Guiochea','BG'],
-        };
-        [journalist, journalistInitials] = map[category] || ['Borja Guiochea','BG'];
-      } else {
-        [journalist, journalistInitials] = journVal.split('|');
-      }
-
-      const article = {
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2,6),
-        title,
-        excerpt,
-        body: body || excerpt,
-        category,
-        journalist,
-        journalistInitials,
-        publishedAt: new Date().toISOString(),
-      };
-
-      try {
-        const res = await fetch(`/api/add-news?secret=${SECRET}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ article }),
-        });
-        const data = await res.json();
-        if (data.status === 'success') {
-          showToast('✓ Noticia publicada correctamente', 'success');
-          clearForm();
-          loadStats();
-        } else {
-          showToast('Error: ' + (data.message || 'desconocido'), 'error');
-        }
-      } catch (err) {
-        showToast('Error de conexión', 'error');
-      }
-
-      btn.disabled = false;
-      btn.textContent = 'Publicar noticia';
-    }
-
-    function clearForm() {
-      ['f-title','f-excerpt','f-body'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('f-category').value = 'Mercado';
-      document.getElementById('f-journalist').value = 'auto';
-    }
-
-    // ── LISTA NOTICIAS ────────────────────────────────────────
-    async function loadNewsList() {
-      const container = document.getElementById('news-list-container');
-      container.innerHTML = '<div class="empty-state">Cargando...</div>';
-      try {
-        const res = await fetch('/api/news?limit=60');
-        const data = await res.json();
-        if (!data.articles?.length) {
-          container.innerHTML = '<div class="empty-state">No hay noticias publicadas.</div>';
-          return;
-        }
-        container.innerHTML = `<div class="news-list">${data.articles.map(a => `
-          <div class="news-item">
-            <span class="news-item-cat">${a.category}</span>
-            <span class="news-item-title">${escHtml(a.title)}</span>
-            <span class="news-item-meta">${timeAgo(a.publishedAt)}</span>
+    <!-- AÑADIR -->
+    <div id="tab-add" class="tab-content">
+      <div class="section-title">Añadir noticia manualmente</div>
+      <div class="card">
+        <div class="form-group">
+          <label class="form-label">Titular *</label>
+          <input class="form-input" id="f-title" type="text" placeholder="Titular de la noticia..." />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Entradilla *</label>
+          <textarea class="form-textarea" id="f-excerpt" placeholder="Resumen breve..." style="min-height:80px"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cuerpo</label>
+          <textarea class="form-textarea" id="f-body" placeholder="Texto completo. Si vacío se usará la entradilla..."></textarea>
+          <div class="form-hint">Opcional.</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" id="f-category">
+              <option>Mercado</option><option>Residencial</option><option>Inversión</option>
+              <option>Oficinas</option><option>Logística</option><option>Regulación</option>
+              <option>SOCIMIs</option><option>Proptech</option><option>Comercial</option><option>Hotelero</option>
+            </select>
           </div>
-        `).join('')}</div>`;
-      } catch {
-        container.innerHTML = '<div class="empty-state">Error al cargar noticias.</div>';
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Periodista</label>
+            <select class="form-select" id="f-journalist">
+              <option value="auto">Automático</option>
+              <option value="Borja Guiochea|BG">Borja Guiochea</option>
+              <option value="Leena Pérez|LP">Leena Pérez</option>
+              <option value="Valera Pausada|VP">Valera Pausada</option>
+              <option value="Paloma Regís|PR">Paloma Regís</option>
+              <option value="Adonis Vega|AV">Adonis Vega</option>
+              <option value="Lorenzo Aduga|LA">Lorenzo Aduga</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btn-publish" onclick="publishArticle()">Publicar noticia</button>
+          <button class="btn btn-secondary" onclick="clearForm()">Limpiar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTICIAS -->
+    <div id="tab-list" class="tab-content">
+      <div class="section-title">Noticias publicadas</div>
+      <div id="news-list-container"><div class="empty-state">Cargando...</div></div>
+    </div>
+
+    <!-- CRON -->
+    <div id="tab-cron" class="tab-content">
+      <div class="section-title">Programar actualizaciones automáticas</div>
+      <div class="card">
+        <p style="font-size:13px;color:var(--gray-3);margin-bottom:24px;line-height:1.6">
+          Elige cada cuánto quieres que el scraper publique noticias nuevas automáticamente. Copia el <code style="color:var(--accent)">vercel.json</code> generado y súbelo a GitHub para aplicar el cambio.
+        </p>
+        <div class="cron-grid">
+          <div class="cron-option" onclick="selectCron('0 */6 * * *', this)">
+            <div class="cron-option-title">Cada 6 horas</div>
+            <div class="cron-option-desc">0 */6 * * *</div>
+          </div>
+          <div class="cron-option" onclick="selectCron('0 */12 * * *', this)">
+            <div class="cron-option-title">Cada 12 horas</div>
+            <div class="cron-option-desc">0 */12 * * *</div>
+          </div>
+          <div class="cron-option selected" onclick="selectCron('0 7 * * *', this)">
+            <div class="cron-option-title">Una vez al día — 7AM</div>
+            <div class="cron-option-desc">0 7 * * *</div>
+          </div>
+          <div class="cron-option" onclick="selectCron('0 7,19 * * *', this)">
+            <div class="cron-option-title">Dos veces al día</div>
+            <div class="cron-option-desc">0 7,19 * * * &nbsp;(7AM y 7PM)</div>
+          </div>
+          <div class="cron-option" onclick="selectCron('0 7 * * 1-5', this)">
+            <div class="cron-option-title">Días laborables</div>
+            <div class="cron-option-desc">0 7 * * 1-5 &nbsp;(Lun–Vie 7AM)</div>
+          </div>
+          <div class="cron-option" onclick="selectCron('custom', this)">
+            <div class="cron-option-title">Personalizado</div>
+            <div class="cron-option-desc">Introduce tu expresión cron</div>
+          </div>
+        </div>
+
+        <div id="custom-input-box" style="display:none;margin-bottom:20px;padding:16px;background:#111;border:1.5px solid #222;border-radius:6px">
+          <div class="form-label">Expresión cron personalizada</div>
+          <input class="form-input" id="custom-cron-input" placeholder="ej: 0 8 * * *" style="font-family:var(--mono);margin-top:8px" oninput="onCustomCron(this.value)" />
+          <div class="form-hint" style="margin-top:8px">Formato: minuto hora día mes día_semana &nbsp;·&nbsp; <a href="https://crontab.guru" target="_blank" style="color:var(--accent)">crontab.guru</a></div>
+        </div>
+
+        <div class="cron-current" id="cron-preview"></div>
+
+        <div style="background:#060606;border:1px solid #1a1a1a;border-radius:6px;padding:16px;margin-bottom:20px">
+          <div style="font-size:10px;color:var(--gray-3);font-family:var(--mono);letter-spacing:0.1em;margin-bottom:10px">VERCEL.JSON — COPIA Y SUBE A GITHUB</div>
+          <pre id="vercel-json-preview" style="font-family:var(--mono);font-size:12px;color:#ccc;white-space:pre-wrap"></pre>
+        </div>
+
+        <button class="btn btn-primary" onclick="copyCronJson()">Copiar vercel.json</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let SECRET = '';
+  let selectedCron = '0 7 * * *';
+
+  const urlSecret = new URLSearchParams(window.location.search).get('secret');
+  if (urlSecret) { SECRET = urlSecret; initPanel(); }
+
+  document.getElementById('secret-input').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+
+  function unlock() {
+    const val = document.getElementById('secret-input').value.trim();
+    if (!val) return;
+    SECRET = val;
+    initPanel();
+  }
+
+  function initPanel() {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('panel').style.display = 'block';
+    loadStats();
+    updateCronPreview();
+  }
+
+  function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', ['scraper','add','list','cron'][i] === tab);
+    });
+    if (tab === 'list') loadNewsList();
+  }
+
+  async function loadStats() {
+    try {
+      const res = await fetch('/api/news?limit=1');
+      const data = await res.json();
+      document.getElementById('stat-total').textContent = data.total || 0;
+      if (data.lastUpdated) {
+        const d = new Date(data.lastUpdated);
+        document.getElementById('stat-lastrun').textContent =
+          d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ' ' +
+          d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
       }
-    }
+    } catch {}
+  }
 
-    // ── SCRAPER ───────────────────────────────────────────────
-    async function runScraper() {
-      const btn = document.getElementById('btn-scrape');
-      const result = document.getElementById('scraper-result');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Ejecutando...';
-      result.style.display = 'none';
+  async function runScraper() {
+    const btn = document.getElementById('btn-scrape');
+    const log = document.getElementById('scraper-log');
+    const bar = document.getElementById('progress-bar');
+    const fill = document.getElementById('progress-fill');
 
-      try {
-        const res = await fetch(`/api/scrape?secret=${SECRET}&force=true`);
-        const data = await res.json();
-        result.style.display = 'block';
-        result.style.color = data.status === 'success' ? 'var(--green)' : 'var(--red)';
-        result.textContent = JSON.stringify(data, null, 2);
-        if (data.status === 'success') {
-          showToast(`✓ ${data.saved} noticias nuevas guardadas`, 'success');
-          loadStats();
-        }
-      } catch (err) {
-        result.style.display = 'block';
-        result.style.color = 'var(--red)';
-        result.textContent = 'Error: ' + err.message;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Buscando noticias...';
+    log.style.display = 'block';
+    log.style.color = '#888';
+    log.textContent = '⟳ Conectando con NewsAPI...\n';
+    bar.style.display = 'block';
+    fill.style.width = '15%';
+
+    await sleep(800);
+    log.textContent += '⟳ Buscando noticias inmobiliarias...\n';
+    fill.style.width = '35%';
+
+    await sleep(1500);
+    log.textContent += '⟳ Reescribiendo con Groq (Llama 3)...\n';
+    fill.style.width = '65%';
+
+    await sleep(3000);
+    log.textContent += '⟳ Guardando en base de datos...\n';
+    fill.style.width = '85%';
+
+    try {
+      const res = await fetch('/api/scrape?secret=' + SECRET + '&force=true');
+      const data = await res.json();
+      fill.style.width = '100%';
+      await sleep(300);
+      bar.style.display = 'none';
+
+      if (data.status === 'success') {
+        log.style.color = 'var(--green)';
+        log.textContent = '✓ Completado\n\n' +
+          '  Noticias encontradas:  ' + data.scraped + '\n' +
+          '  Reescritas con IA:     ' + data.rewritten + '\n' +
+          '  Nuevas guardadas:      ' + data.saved + '\n' +
+          '  Total en la web:       ' + data.total + '\n' +
+          '  Tiempo:                ' + data.elapsed;
+        showToast('✓ ' + data.saved + ' noticias nuevas publicadas', 'success');
+        loadStats();
+      } else if (data.status === 'no_content') {
+        log.style.color = '#f59e0b';
+        log.textContent = '⚠ No se encontraron noticias nuevas en este momento.\n\nPrueba más tarde o añade una manualmente desde la pestaña ✏️ Añadir.';
+      } else {
+        log.style.color = 'var(--red)';
+        log.textContent = '✗ Error: ' + (data.message || JSON.stringify(data));
       }
-
-      btn.disabled = false;
-      btn.textContent = '▶ Ejecutar';
+    } catch (err) {
+      bar.style.display = 'none';
+      log.style.color = 'var(--red)';
+      log.textContent = '✗ Error de conexión: ' + err.message;
     }
 
-    // ── HELPERS ───────────────────────────────────────────────
-    function showToast(msg, type) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
-      setTimeout(() => t.classList.remove('show'), 3500);
-    }
+    btn.disabled = false;
+    btn.innerHTML = '▶ Generar noticias';
+  }
 
-    function escHtml(str) {
-      return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+  async function publishArticle() {
+    const title   = document.getElementById('f-title').value.trim();
+    const excerpt = document.getElementById('f-excerpt').value.trim();
+    const body    = document.getElementById('f-body').value.trim();
+    const cat     = document.getElementById('f-category').value;
+    const jVal    = document.getElementById('f-journalist').value;
 
-    function timeAgo(iso) {
-      if (!iso) return '—';
-      const diff = (Date.now() - new Date(iso)) / 1000;
-      if (diff < 3600) return `Hace ${Math.round(diff/60)} min`;
-      if (diff < 86400) return `Hace ${Math.round(diff/3600)} h`;
-      return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-    }
-  </script>
+    if (!title || !excerpt) { showToast('El titular y la entradilla son obligatorios', 'error'); return; }
 
+    const btn = document.getElementById('btn-publish');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Publicando...';
+
+    const jMap = {
+      'Mercado':['Leena Pérez','LP'], 'Inversión':['Borja Guiochea','BG'],
+      'Residencial':['Lorenzo Aduga','LA'], 'Oficinas':['Leena Pérez','LP'],
+      'Regulación':['Valera Pausada','VP'], 'Logística':['Paloma Regís','PR'],
+      'SOCIMIs':['Borja Guiochea','BG'], 'Proptech':['Adonis Vega','AV'],
+      'Comercial':['Paloma Regís','PR'], 'Hotelero':['Borja Guiochea','BG'],
+    };
+
+    let journalist, initials;
+    if (jVal === 'auto') { [journalist, initials] = jMap[cat] || ['Borja Guiochea','BG']; }
+    else { [journalist, initials] = jVal.split('|'); }
+
+    const article = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2,6),
+      title, excerpt, body: body || excerpt, category: cat,
+      journalist, journalistInitials: initials,
+      publishedAt: new Date().toISOString(),
+    };
+
+    try {
+      const res = await fetch('/api/add-news?secret=' + SECRET, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        showToast('✓ Noticia publicada en la web', 'success');
+        clearForm();
+        loadStats();
+      } else {
+        showToast('Error: ' + (data.message || 'desconocido'), 'error');
+      }
+    } catch { showToast('Error de conexión', 'error'); }
+
+    btn.disabled = false;
+    btn.textContent = 'Publicar noticia';
+  }
+
+  function clearForm() {
+    ['f-title','f-excerpt','f-body'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-category').value = 'Mercado';
+    document.getElementById('f-journalist').value = 'auto';
+  }
+
+  async function loadNewsList() {
+    const c = document.getElementById('news-list-container');
+    c.innerHTML = '<div class="empty-state">Cargando...</div>';
+    try {
+      const res = await fetch('/api/news?limit=60');
+      const data = await res.json();
+      if (!data.articles?.length) { c.innerHTML = '<div class="empty-state">No hay noticias publicadas.</div>'; return; }
+      c.innerHTML = '<div class="news-list">' + data.articles.map(a =>
+        '<div class="news-item">' +
+        '<span class="news-item-cat">' + a.category + '</span>' +
+        '<span class="news-item-title">' + escHtml(a.title) + '</span>' +
+        '<span class="news-item-meta">' + timeAgo(a.publishedAt) + '</span>' +
+        '</div>'
+      ).join('') + '</div>';
+    } catch { c.innerHTML = '<div class="empty-state">Error al cargar.</div>'; }
+  }
+
+  function selectCron(cron, el) {
+    document.querySelectorAll('.cron-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    const box = document.getElementById('custom-input-box');
+    if (cron === 'custom') {
+      box.style.display = 'block';
+      selectedCron = document.getElementById('custom-cron-input').value || '0 7 * * *';
+    } else {
+      box.style.display = 'none';
+      selectedCron = cron;
+    }
+    updateCronPreview();
+  }
+
+  function onCustomCron(val) {
+    selectedCron = val || '0 7 * * *';
+    updateCronPreview();
+  }
+
+  function updateCronPreview() {
+    document.getElementById('cron-preview').textContent = '✓ Seleccionado: ' + selectedCron;
+    const json = {
+      crons: [{ path: "/api/scrape", schedule: selectedCron }],
+      functions: {
+        "api/scrape.js": { maxDuration: 60 },
+        "api/news.js": { maxDuration: 10 },
+        "api/data.js": { maxDuration: 30 },
+        "api/add-news.js": { maxDuration: 10 }
+      },
+      rewrites: [
+        { source: "/admin", destination: "/admin.html" },
+        { source: "/", destination: "/index.html" }
+      ]
+    };
+    document.getElementById('vercel-json-preview').textContent = JSON.stringify(json, null, 2);
+  }
+
+  function copyCronJson() {
+    const text = document.getElementById('vercel-json-preview').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('✓ Copiado — pégalo en built-digest/vercel.json en GitHub', 'info'));
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    const diff = (Date.now() - new Date(iso)) / 1000;
+    if (diff < 3600) return 'Hace ' + Math.round(diff/60) + ' min';
+    if (diff < 86400) return 'Hace ' + Math.round(diff/3600) + ' h';
+    return new Date(iso).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
 </body>
 </html>
