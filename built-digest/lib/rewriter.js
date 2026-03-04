@@ -3,23 +3,28 @@ const { assignJournalist } = require("./journalists");
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const UNSPLASH_QUERIES = {
-  "Residencial": "residential building apartment spain",
-  "Oficinas":    "modern office building architecture",
-  "Inversión":   "real estate investment city skyline",
-  "Regulación":  "housing law government building spain",
-  "Mercado":     "real estate market city spain",
-  "Logística":   "logistics warehouse industrial building",
-  "SOCIMIs":     "real estate finance investment",
-  "Proptech":    "technology smart building innovation",
-  "Comercial":   "commercial real estate shopping center",
-  "Hotelero":    "hotel building architecture spain",
-  "default":     "real estate spain city architecture",
+// Picsum Photos — gratis, sin API key, imágenes reales de alta calidad
+// Usamos IDs fijos por categoría para que las imágenes sean coherentes
+const CATEGORY_IMAGE_IDS = {
+  "Residencial": [164, 165, 323, 366, 431, 478, 534],
+  "Oficinas":    [1029, 1033, 1040, 1048, 1060, 1074, 1080],
+  "Inversión":   [256, 260, 265, 270, 275, 280, 285],
+  "Regulación":  [208, 209, 210, 211, 212, 213, 214],
+  "Mercado":     [371, 374, 377, 380, 383, 386, 389],
+  "Logística":   [325, 326, 327, 328, 329, 330, 331],
+  "SOCIMIs":     [240, 241, 242, 243, 244, 245, 246],
+  "Proptech":    [0, 1, 2, 3, 4, 5, 6],
+  "Comercial":   [180, 181, 182, 183, 184, 185, 186],
+  "Hotelero":    [400, 401, 402, 403, 404, 405, 406],
+  "default":     [350, 351, 352, 353, 354, 355, 356],
 };
 
-function getUnsplashUrl(category, seed) {
-  const query = UNSPLASH_QUERIES[category] || UNSPLASH_QUERIES["default"];
-  return `https://source.unsplash.com/800x450/?${encodeURIComponent(query)}&sig=${seed}`;
+function getImageUrl(category, seed) {
+  const ids = CATEGORY_IMAGE_IDS[category] || CATEGORY_IMAGE_IDS["default"];
+  // Usar el seed para elegir siempre la misma imagen para el mismo artículo
+  const seedNum = seed ? seed.split('').reduce((a, c) => a + c.charCodeAt(0), 0) : 0;
+  const id = ids[seedNum % ids.length];
+  return `https://picsum.photos/id/${id}/800/450`;
 }
 
 const SYSTEM_PROMPT = `Eres el editor de Built Digest, portal de noticias inmobiliarias español independiente.
@@ -77,7 +82,7 @@ Responde solo con JSON estricto.`,
       excerpt: parsed.excerpt,
       body: parsed.body || "",
       category,
-      image: getUnsplashUrl(category, id),
+      image: getImageUrl(category, id),
       journalist: journalist.name,
       journalistInitials: journalist.initials,
       publishedAt: new Date().toISOString(),
