@@ -1,71 +1,39 @@
-// ─────────────────────────────────────────────────────────────
-// PERIODISTAS FICTICIOS
-// Los nombres son anagramas de personas reales del sector
-// ─────────────────────────────────────────────────────────────
-
 const JOURNALISTS = [
-  {
-    name: "Borja Guiochea",
-    initials: "BG",
-    specialties: ["exclusivas", "inversión", "promoción"],
-    bio: "Redactor jefe. Especializado en grandes operaciones corporativas.",
-  },
-  {
-    name: "Leena Pérez",
-    initials: "LP",
-    specialties: ["mercado", "oficinas", "datos"],
-    bio: "Analista de mercado. Experta en datos y tendencias.",
-  },
-  {
-    name: "Valera Pausada",
-    initials: "VP",
-    specialties: ["regulación", "alquiler", "vivienda pública"],
-    bio: "Especialista en política de vivienda y regulación.",
-  },
-  {
-    name: "Paloma Regís",
-    initials: "PR",
-    specialties: ["comercial", "retail", "logística"],
-    bio: "Cubre el sector comercial y logístico.",
-  },
-  {
-    name: "Adonis Vega",
-    initials: "AV",
-    specialties: ["proptech", "tecnología", "data centers"],
-    bio: "Especializado en innovación y proptech.",
-  },
-  {
-    name: "Lorenzo Aduga",
-    initials: "LA",
-    specialties: ["residencial", "obra nueva", "urbanismo"],
-    bio: "Cubre el segmento residencial y los nuevos desarrollos.",
-  },
+  { name: "Carlos Mendoza",    initials: "CM", specialties: ["inversión", "socimis"],      bio: "Especialista en grandes operaciones corporativas y fondos de inversión." },
+  { name: "Elena Vázquez",     initials: "EV", specialties: ["mercado", "datos"],           bio: "Analista de mercado. Experta en tendencias y precios residenciales." },
+  { name: "Javier Pardo",      initials: "JP", specialties: ["regulación", "alquiler"],    bio: "Especialista en política de vivienda y normativa urbanística." },
+  { name: "Sofía Herrera",     initials: "SH", specialties: ["comercial", "logística"],    bio: "Cubre el sector logístico e inmuebles comerciales." },
+  { name: "Marcos Iglesias",   initials: "MI", specialties: ["proptech", "tecnología"],    bio: "Especializado en innovación tecnológica aplicada al sector inmobiliario." },
+  { name: "Ana Castellano",    initials: "AC", specialties: ["residencial", "obra nueva"], bio: "Redactora de obra nueva y desarrollo urbanístico." },
+  { name: "Pablo Serrano",     initials: "PS", specialties: ["hotelero", "inversión"],     bio: "Cubre el segmento hotelero y activos alternativos." },
+  { name: "Laura Montero",     initials: "LM", specialties: ["oficinas", "mercado"],       bio: "Especialista en mercado de oficinas y flex space." },
+  { name: "Ignacio Fuentes",   initials: "IF", specialties: ["socimis", "bolsa"],          bio: "Sigue la actualidad de las SOCIMIs y el mercado de capitales." },
+  { name: "Marta Delgado",     initials: "MD", specialties: ["residencial", "alquiler"],   bio: "Redactora de vivienda en alquiler y acceso a la vivienda." },
+  { name: "Rodrigo Alameda",   initials: "RA", specialties: ["logística", "industrial"],   bio: "Especializado en activos logísticos e industriales." },
+  { name: "Cristina Llorente", initials: "CL", specialties: ["proptech", "sostenibilidad"],bio: "Cubre innovación, ESG y digitalización del sector." },
 ];
 
 function assignJournalist(category) {
   const categoryMap = {
-    exclusiva:         ["BG"],
-    inversión:         ["BG", "AV"],
-    promoción:         ["BG", "LA"],
-    residencial:       ["LA", "VP"],
-    oficinas:          ["LP", "PR"],
-    mercado:           ["LP", "BG"],
-    regulación:        ["VP"],
-    alquiler:          ["VP", "LA"],
-    proptech:          ["AV"],
-    tecnología:        ["AV"],
-    comercial:         ["PR"],
-    logística:         ["PR"],
-    "vivienda pública":["VP", "LA"],
-    "data centers":    ["AV"],
-    retail:            ["PR"],
-    default:           ["BG", "LP", "LA"],
+    inversión:      ["CM", "PS"],
+    residencial:    ["AC", "MD"],
+    oficinas:       ["LM", "EV"],
+    mercado:        ["EV", "LM"],
+    regulación:     ["JP", "MD"],
+    alquiler:       ["JP", "MD"],
+    logística:      ["SH", "RA"],
+    hotelero:       ["PS", "CM"],
+    comercial:      ["SH", "RA"],
+    socimis:        ["IF", "CM"],
+    proptech:       ["MI", "CL"],
+    tecnología:     ["MI", "CL"],
+    default:        ["CM", "EV", "AC", "LM"],
   };
 
   const cat = (category || "").toLowerCase();
   const candidates = categoryMap[cat] || categoryMap["default"];
   const pick = candidates[Math.floor(Math.random() * candidates.length)];
-  return JOURNALISTS.find((j) => j.initials === pick) || JOURNALISTS[0];
+  return JOURNALISTS.find(j => j.initials === pick) || JOURNALISTS[Math.floor(Math.random() * JOURNALISTS.length)];
 }
 
 module.exports = { JOURNALISTS, assignJournalist };

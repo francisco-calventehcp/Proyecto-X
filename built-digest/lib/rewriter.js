@@ -1,24 +1,37 @@
-// ─────────────────────────────────────────────────────────────
-// REWRITER — Reescribe noticias usando Groq (GRATIS)
-// Modelo: llama-3.3-70b-versatile
-// ─────────────────────────────────────────────────────────────
-
 const { Groq } = require("groq-sdk");
 const { assignJournalist } = require("./journalists");
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const SYSTEM_PROMPT = `Eres el editor de Built Digest, portal de noticias inmobiliarias español independiente fundado en 2020.
+const UNSPLASH_QUERIES = {
+  "Residencial": "residential building apartment spain",
+  "Oficinas":    "modern office building architecture",
+  "Inversión":   "real estate investment city skyline",
+  "Regulación":  "housing law government building spain",
+  "Mercado":     "real estate market city spain",
+  "Logística":   "logistics warehouse industrial building",
+  "SOCIMIs":     "real estate finance investment",
+  "Proptech":    "technology smart building innovation",
+  "Comercial":   "commercial real estate shopping center",
+  "Hotelero":    "hotel building architecture spain",
+  "default":     "real estate spain city architecture",
+};
+
+function getUnsplashUrl(category, seed) {
+  const query = UNSPLASH_QUERIES[category] || UNSPLASH_QUERIES["default"];
+  return `https://source.unsplash.com/800x450/?${encodeURIComponent(query)}&sig=${seed}`;
+}
+
+const SYSTEM_PROMPT = `Eres el editor de Built Digest, portal de noticias inmobiliarias español independiente.
 Tu trabajo es REESCRIBIR noticias del sector inmobiliario español para publicarlas como propias.
 
 REGLAS ESTRICTAS:
-1. NUNCA copies frases textuales de la fuente. Reescribe completamente con tus propias palabras.
+1. NUNCA copies frases textuales. Reescribe completamente.
 2. Mantén los DATOS numéricos exactos (cifras, porcentajes, precios, metros cuadrados).
 3. Mantén los NOMBRES propios correctos (empresas, personas, ubicaciones).
 4. Tono editorial, profesional, directo. Sin lenguaje genérico de IA.
-5. Escribe en español de España (no latinoamericano).
-6. NO menciones NUNCA la fuente original.
-7. Escribe como si Built Digest hubiera investigado la noticia directamente.
+5. Español de España (no latinoamericano).
+6. NO menciones la fuente original.
 
 RESPONDE ÚNICAMENTE con JSON válido, sin markdown ni backticks:
 {
@@ -30,6 +43,7 @@ RESPONDE ÚNICAMENTE con JSON válido, sin markdown ni backticks:
 
 async function rewriteArticle(article) {
   const journalist = assignJournalist(article.category);
+  const id = generateId();
 
   try {
     const response = await groq.chat.completions.create({
@@ -55,13 +69,15 @@ Responde solo con JSON estricto.`,
     const text = response.choices[0].message.content.trim();
     const clean = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     const parsed = JSON.parse(clean);
+    const category = parsed.category || article.category;
 
     return {
-      id: generateId(),
+      id,
       title: parsed.title,
       excerpt: parsed.excerpt,
       body: parsed.body || "",
-      category: parsed.category || article.category,
+      category,
+      image: getUnsplashUrl(category, id),
       journalist: journalist.name,
       journalistInitials: journalist.initials,
       publishedAt: new Date().toISOString(),
@@ -77,13 +93,11 @@ Responde solo con JSON estricto.`,
 async function rewriteBatch(articles, maxArticles = 8) {
   const toProcess = articles.slice(0, maxArticles);
   const results = [];
-
   for (const article of toProcess) {
     const rewritten = await rewriteArticle(article);
     if (rewritten) results.push(rewritten);
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 300));
   }
-
   console.log(`[rewriter] ${results.length}/${toProcess.length} artículos procesados`);
   return results;
 }
