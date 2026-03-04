@@ -10,18 +10,19 @@ const META_KEY = "built-digest:meta";
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") return res.status(200).end();
 
+  // Acepta tanto GET como DELETE
+  if (req.method !== "DELETE" && req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   const secret = req.query.secret;
   if (secret !== process.env.CRON_SECRET) {
     return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  if (req.method !== "DELETE") {
-    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
@@ -42,14 +43,14 @@ module.exports = async function handler(req, res) {
     const filtered = articles.filter(a => a.id !== id);
 
     if (filtered.length === articles.length) {
-      return res.status(404).json({ error: "Noticia no encontrada" });
+      return res.status(404).json({ error: "Noticia no encontrada con id: " + id });
     }
 
     await redis.set(NEWS_KEY, filtered);
 
     return res.status(200).json({
       status: "success",
-      message: `Noticia eliminada`,
+      message: "Noticia eliminada",
       total: filtered.length,
     });
 
