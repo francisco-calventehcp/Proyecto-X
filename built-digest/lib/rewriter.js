@@ -3,7 +3,7 @@
 // Modelo: llama-3.3-70b-versatile
 // ─────────────────────────────────────────────────────────────
 
-const Groq = require("groq-sdk");
+const { Groq } = require("groq-sdk");
 const { assignJournalist } = require("./journalists");
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -81,7 +81,6 @@ async function rewriteBatch(articles, maxArticles = 8) {
   for (const article of toProcess) {
     const rewritten = await rewriteArticle(article);
     if (rewritten) results.push(rewritten);
-    // Pausa entre llamadas para evitar rate limits
     await new Promise((r) => setTimeout(r, 300));
   }
 
