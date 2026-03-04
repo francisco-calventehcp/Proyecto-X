@@ -6,7 +6,6 @@
   <title>Built Digest — Noticias inmobiliarias</title>
   <meta name="description" content="El digest diario del sector inmobiliario español. Noticias, datos de mercado y análisis." />
   <style>
-    /* ── RESET & BASE ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -35,7 +34,7 @@
 
     a { color: inherit; text-decoration: none; }
 
-    /* ── HEADER ───────────────────────────────────────────── */
+    /* ── HEADER ── */
     header {
       border-bottom: 2px solid var(--black);
       padding: 0 24px;
@@ -77,7 +76,7 @@
       font-family: var(--mono);
     }
 
-    /* ── TICKER DE DATOS INE ─────────────────────────────── */
+    /* ── TICKER ── */
     .ticker-bar {
       background: var(--black);
       color: var(--white);
@@ -107,14 +106,14 @@
     .ticker-change.up   { color: #34d399; }
     .ticker-change.down { color: #f87171; }
 
-    /* ── LAYOUT PRINCIPAL ────────────────────────────────── */
+    /* ── LAYOUT ── */
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
-    /* ── HERO / CATEGORÍAS ───────────────────────────────── */
+    /* ── FILTROS ── */
     .filters {
       display: flex;
       gap: 4px;
@@ -141,7 +140,7 @@
     .filter-btn:hover { border-color: var(--black); color: var(--black); }
     .filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
 
-    /* ── GRID DE NOTICIAS ────────────────────────────────── */
+    /* ── GRID ── */
     .news-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -154,22 +153,37 @@
     @media (max-width: 900px) { .news-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 600px) { .news-grid { grid-template-columns: 1fr; } }
 
-    /* Primera noticia ocupa 2 columnas */
-    .news-card:first-child {
-      grid-column: span 2;
-    }
+    .news-card:first-child { grid-column: span 2; }
     @media (max-width: 900px) { .news-card:first-child { grid-column: span 1; } }
 
     .news-card {
       background: var(--white);
-      padding: 24px;
       cursor: pointer;
       transition: background 0.1s;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      overflow: hidden;
     }
     .news-card:hover { background: var(--gray-1); }
+
+    /* ── IMAGEN ── */
+    .card-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+      background: var(--gray-2);
+      transition: opacity 0.3s;
+    }
+    .news-card:first-child .card-image { height: 240px; }
+
+    .card-body {
+      padding: 20px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
 
     .card-meta {
       display: flex;
@@ -233,7 +247,7 @@
       border-top: 1px solid var(--gray-2);
     }
 
-    /* ── TERMÓMETRO DEL MERCADO ──────────────────────────── */
+    /* ── TERMÓMETRO ── */
     .market-section {
       border-top: 2px solid var(--black);
       padding: 40px 0;
@@ -268,41 +282,16 @@
       gap: 6px;
     }
 
-    .ind-label {
-      font-size: 11px;
-      color: var(--gray-3);
-      font-weight: 500;
-      line-height: 1.3;
-    }
-
-    .ind-value {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      font-family: var(--mono);
-      line-height: 1;
-    }
-
-    .ind-change {
-      font-size: 11px;
-      font-family: var(--mono);
-      font-weight: 600;
-    }
+    .ind-label { font-size: 11px; color: var(--gray-3); font-weight: 500; line-height: 1.3; }
+    .ind-value { font-size: 24px; font-weight: 800; letter-spacing: -1px; font-family: var(--mono); line-height: 1; }
+    .ind-change { font-size: 11px; font-family: var(--mono); font-weight: 600; }
     .ind-change.up   { color: var(--accent2); }
     .ind-change.down { color: var(--red); }
     .ind-change.flat { color: var(--gray-3); }
-
-    .ind-date {
-      font-size: 10px;
-      color: var(--gray-3);
-      font-family: var(--mono);
-      margin-top: 2px;
-    }
-
-    /* Sparkline */
+    .ind-date { font-size: 10px; color: var(--gray-3); font-family: var(--mono); margin-top: 2px; }
     .sparkline { width: 100%; height: 28px; margin-top: 4px; }
 
-    /* ── MODAL ───────────────────────────────────────────── */
+    /* ── MODAL ── */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -320,6 +309,14 @@
       width: 100%;
       margin-top: 40px;
       border: 2px solid var(--black);
+      overflow: hidden;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      display: block;
     }
 
     .modal-header {
@@ -341,38 +338,13 @@
     }
     .modal-close:hover { color: var(--black); }
 
-    .modal-category {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-
-    .modal-title {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      line-height: 1.25;
-    }
-
-    .modal-byline {
-      font-size: 12px;
-      color: var(--gray-3);
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--gray-2);
-    }
-
-    .modal-body {
-      padding: 24px 28px 32px;
-      font-size: 15px;
-      line-height: 1.75;
-      color: var(--gray-4);
-    }
-
+    .modal-category { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+    .modal-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.25; }
+    .modal-byline { font-size: 12px; color: var(--gray-3); padding-bottom: 20px; border-bottom: 1px solid var(--gray-2); }
+    .modal-body { padding: 24px 28px 32px; font-size: 15px; line-height: 1.75; color: var(--gray-4); }
     .modal-body p { margin-bottom: 16px; }
 
-    /* ── ESTADOS ─────────────────────────────────────────── */
+    /* ── ESTADOS ── */
     .state-loading, .state-empty {
       padding: 80px 24px;
       text-align: center;
@@ -390,7 +362,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── FOOTER ──────────────────────────────────────────── */
+    /* ── FOOTER ── */
     footer {
       border-top: 2px solid var(--black);
       padding: 24px;
@@ -414,7 +386,6 @@
 </head>
 <body>
 
-  <!-- ── HEADER ──────────────────────────────────────────── -->
   <header>
     <div class="header-inner">
       <div class="logo">
@@ -425,7 +396,6 @@
     </div>
   </header>
 
-  <!-- ── TICKER DE DATOS ─────────────────────────────────── -->
   <div class="ticker-bar">
     <div class="ticker-inner" id="ticker-inner">
       <span class="ticker-item">
@@ -434,10 +404,8 @@
     </div>
   </div>
 
-  <!-- ── CONTENIDO PRINCIPAL ─────────────────────────────── -->
   <main class="container">
 
-    <!-- Filtros de categoría -->
     <div class="filters" id="filters">
       <button class="filter-btn active" data-cat="Todos">Todos</button>
       <button class="filter-btn" data-cat="Mercado">Mercado</button>
@@ -452,7 +420,6 @@
       <button class="filter-btn" data-cat="Comercial">Comercial</button>
     </div>
 
-    <!-- Grid de noticias -->
     <div id="news-container">
       <div class="state-loading">
         <div class="spinner"></div>
@@ -460,11 +427,9 @@
       </div>
     </div>
 
-    <!-- Termómetro del mercado -->
     <section class="market-section">
       <div class="section-title">Termómetro del mercado — Datos INE</div>
       <div class="indicators-grid" id="indicators-grid">
-        <!-- Se rellena con JS -->
         <div class="indicator-card" style="grid-column:1/-1; padding:40px; text-align:center; color:#a8a29e; font-size:13px;">
           Cargando datos del INE...
         </div>
@@ -473,9 +438,9 @@
 
   </main>
 
-  <!-- ── MODAL DE ARTÍCULO ───────────────────────────────── -->
   <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
     <div class="modal" id="modal">
+      <img class="modal-image" id="modal-image" src="" alt="" style="display:none" />
       <div class="modal-header">
         <button class="modal-close" onclick="closeModal()">✕</button>
         <div class="modal-category" id="modal-category"></div>
@@ -486,7 +451,6 @@
     </div>
   </div>
 
-  <!-- ── FOOTER ──────────────────────────────────────────── -->
   <footer>
     <div class="footer-inner">
       <span>Built Digest © 2024 — Portal automático de noticias inmobiliarias</span>
@@ -495,11 +459,9 @@
   </footer>
 
   <script>
-    // ── ESTADO ─────────────────────────────────────────────
     let allArticles = [];
     let activeCategory = 'Todos';
 
-    // ── FECHA LEGIBLE ──────────────────────────────────────
     function formatDate(iso) {
       if (!iso) return '—';
       const d = new Date(iso);
@@ -514,19 +476,15 @@
       return formatDate(iso);
     }
 
-    // ── CARGAR NOTICIAS ────────────────────────────────────
     async function loadNews() {
       try {
         const res = await fetch('/api/news?limit=20');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
         allArticles = data.articles || [];
-
         if (data.lastUpdated) {
-          document.getElementById('last-updated').textContent =
-            'Actualizado: ' + timeAgo(data.lastUpdated);
+          document.getElementById('last-updated').textContent = 'Actualizado: ' + timeAgo(data.lastUpdated);
         }
-
         renderNews(allArticles);
       } catch (err) {
         document.getElementById('news-container').innerHTML = `
@@ -538,38 +496,35 @@
       }
     }
 
-    // ── RENDERIZAR NOTICIAS ────────────────────────────────
     function renderNews(articles) {
       const container = document.getElementById('news-container');
-
       const filtered = activeCategory === 'Todos'
         ? articles
         : articles.filter(a => a.category === activeCategory);
 
       if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="state-empty">
-            <div>No hay noticias en esta categoría aún.</div>
-          </div>`;
+        container.innerHTML = `<div class="state-empty"><div>No hay noticias en esta categoría aún.</div></div>`;
         return;
       }
 
       const cards = filtered.map((article, i) => `
         <article class="news-card" onclick="openModal(${i})" data-idx="${i}">
-          <div class="card-meta">
-            <span class="card-category ${article.category}">${article.category || 'Mercado'}</span>
-            <span class="card-date">${timeAgo(article.publishedAt)}</span>
+          ${article.image ? `<img class="card-image" src="${escHtml(article.image)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-category ${article.category}">${article.category || 'Mercado'}</span>
+              <span class="card-date">${timeAgo(article.publishedAt)}</span>
+            </div>
+            <h2 class="card-title">${escHtml(article.title)}</h2>
+            <p class="card-excerpt">${escHtml(article.excerpt)}</p>
+            <div class="card-journalist">${escHtml(article.journalist || '')}</div>
           </div>
-          <h2 class="card-title">${escHtml(article.title)}</h2>
-          <p class="card-excerpt">${escHtml(article.excerpt)}</p>
-          <div class="card-journalist">${escHtml(article.journalist || '')}</div>
         </article>
       `).join('');
 
       container.innerHTML = `<div class="news-grid">${cards}</div>`;
     }
 
-    // ── MODAL ──────────────────────────────────────────────
     function openModal(idx) {
       const filtered = activeCategory === 'Todos'
         ? allArticles
@@ -577,12 +532,21 @@
       const article = filtered[idx];
       if (!article) return;
 
+      // Imagen en modal
+      const modalImg = document.getElementById('modal-image');
+      if (article.image) {
+        modalImg.src = article.image;
+        modalImg.style.display = 'block';
+        modalImg.onerror = () => { modalImg.style.display = 'none'; };
+      } else {
+        modalImg.style.display = 'none';
+      }
+
       document.getElementById('modal-category').textContent = article.category || '';
       document.getElementById('modal-title').textContent = article.title;
       document.getElementById('modal-byline').textContent =
         `${article.journalist || ''} · ${formatDate(article.publishedAt)}`;
 
-      // Cuerpo: convertir párrafos en <p>
       const body = (article.body || article.excerpt || '')
         .split(/\n+/)
         .filter(p => p.trim())
@@ -603,7 +567,6 @@
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-    // ── FILTROS ────────────────────────────────────────────
     document.getElementById('filters').addEventListener('click', e => {
       const btn = e.target.closest('.filter-btn');
       if (!btn) return;
@@ -613,7 +576,6 @@
       renderNews(allArticles);
     });
 
-    // ── DATOS INE ──────────────────────────────────────────
     async function loadMarketData() {
       try {
         const res = await fetch('/api/data');
@@ -636,7 +598,6 @@
         grid.innerHTML = `<div class="indicator-card" style="grid-column:1/-1;padding:32px;text-align:center;color:#a8a29e;font-size:13px;">Sin datos disponibles.</div>`;
         return;
       }
-
       grid.innerHTML = keys.map(key => {
         const ind = indicators[key];
         const mom = ind.changes?.mom;
@@ -644,7 +605,6 @@
         const changeClass = mom > 0 ? 'up' : mom < 0 ? 'down' : 'flat';
         const changeSign  = mom > 0 ? '▲' : mom < 0 ? '▼' : '—';
         const sparkSvg = renderSparkline(ind.history || []);
-
         return `
           <div class="indicator-card">
             <div class="ind-label">${ind.label}</div>
@@ -684,7 +644,6 @@
     function renderTicker(indicators) {
       const keys = Object.keys(indicators);
       if (keys.length === 0) return;
-
       const items = keys.map(key => {
         const ind = indicators[key];
         const mom = ind.changes?.mom;
@@ -697,18 +656,14 @@
             ${mom !== null ? `<span class="ticker-change ${cls}">${sign}${Math.abs(mom)}%</span>` : ''}
           </span>`;
       }).join('');
-
-      // Duplicar para el loop continuo
       document.getElementById('ticker-inner').innerHTML = items + items;
     }
 
-    // ── HELPERS ────────────────────────────────────────────
     function escHtml(str) {
       if (!str) return '';
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    // ── INIT ───────────────────────────────────────────────
     loadNews();
     loadMarketData();
   </script>
