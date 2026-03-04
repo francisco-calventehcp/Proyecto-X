@@ -19,15 +19,20 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const meta = await getMeta();
-  if (meta.lastRun) {
-    const hoursSince = (Date.now() - new Date(meta.lastRun).getTime()) / (1000 * 60 * 60);
-    if (hoursSince < 6) {
-      return res.status(200).json({
-        status: "skipped",
-        reason: `Último scrape hace ${hoursSince.toFixed(1)}h`,
-        lastRun: meta.lastRun,
-      });
+  const force = req.query.force === "true";
+
+  if (!force) {
+    const meta = await getMeta();
+    if (meta.lastRun) {
+      const hoursSince = (Date.now() - new Date(meta.lastRun).getTime()) / (1000 * 60 * 60);
+      if (hoursSince < 6) {
+        return res.status(200).json({
+          status: "skipped",
+          reason: `Último scrape hace ${hoursSince.toFixed(1)}h`,
+          lastRun: meta.lastRun,
+          tip: "Añade &force=true para forzar",
+        });
+      }
     }
   }
 
