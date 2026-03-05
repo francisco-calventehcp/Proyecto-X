@@ -17,9 +17,16 @@
     },
     "api/add-news.js": {
       "maxDuration": 10
+    },
+    "api/delete-news.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
+    {
+      "source": "/noticia/:id",
+      "destination": "/article.html"
+    },
     {
       "source": "/admin",
       "destination": "/admin.html"
