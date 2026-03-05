@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Built Digest</title>
+<meta name="description" id="page-desc" content="">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1714;--paper:#f5f0e8;--cream:#ebe4d6;--accent:#c13832;
+  --warm-gray:#8a827a;--light-gray:#d4cec4;--off-white:#faf8f4;
+  --gold:#b8952f;--dark-olive:#3a3d2f;--sage:#6b7355;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+a{color:inherit;text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:0 2rem}
+.article-container{max-width:760px;margin:0 auto;padding:0 2rem}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--light-gray);position:sticky;top:0;background:var(--paper);z-index:100;transition:box-shadow .3s}
+.header-main{display:flex;justify-content:space-between;align-items:center;padding:1rem 0}
+.logo{display:flex;flex-direction:column}
+.logo-mark{font-family:'Playfair Display',serif;font-weight:900;font-size:2rem;letter-spacing:-.03em;line-height:1}
+.logo-mark span{color:var(--accent)}
+.logo-tag{font-size:.55rem;text-transform:uppercase;letter-spacing:.25em;color:var(--warm-gray);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:1.5rem}
+.back-btn{display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;font-weight:600;color:var(--warm-gray);text-transform:uppercase;letter-spacing:.06em;transition:color .2s}
+.back-btn:hover{color:var(--accent)}
+.back-btn svg{transition:transform .2s}
+.back-btn:hover svg{transform:translateX(-3px)}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{padding:1rem 0;font-size:.72rem;color:var(--warm-gray);display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--light-gray)}
+.breadcrumb a{transition:color .2s}.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb-sep{opacity:.4}
+.breadcrumb-current{color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:400px}
+
+/* ── ARTICLE HEADER ── */
+.article-header{padding:3rem 0 2rem}
+.article-category-badge{display:inline-flex;align-items:center;gap:.5rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:1.2rem}
+.article-category-badge::before{content:'';width:24px;height:2px;background:var(--accent)}
+.article-title{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.8rem,4vw,3rem);line-height:1.12;letter-spacing:-.02em;margin-bottom:1.2rem}
+.article-excerpt{font-family:'Source Serif 4',serif;font-size:1.15rem;line-height:1.65;color:var(--warm-gray);margin-bottom:2rem;font-weight:300}
+.article-meta{display:flex;align-items:center;gap:1.5rem;padding:1.2rem 0;border-top:1px solid var(--light-gray);border-bottom:1px solid var(--light-gray);margin-bottom:2.5rem;flex-wrap:wrap}
+.author-block{display:flex;align-items:center;gap:.8rem}
+.author-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:var(--paper);flex-shrink:0}
+.author-name{font-weight:700;font-size:.85rem}
+.author-bio{font-size:.72rem;color:var(--warm-gray);margin-top:1px}
+.meta-divider{width:1px;height:32px;background:var(--light-gray)}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--warm-gray)}
+.meta-value{font-size:.82rem;font-weight:500;font-family:'JetBrains Mono',monospace}
+
+/* ── HERO IMAGE ── */
+.article-hero{margin-bottom:3rem;position:relative}
+.article-hero img{width:100%;height:460px;object-fit:cover;border-radius:8px;display:block}
+.article-hero-caption{font-size:.7rem;color:var(--warm-gray);margin-top:.7rem;font-style:italic;padding-left:.5rem;border-left:2px solid var(--light-gray)}
+
+/* ── ARTICLE BODY ── */
+.article-body{font-family:'Source Serif 4',serif;font-size:1.08rem;line-height:1.82;color:var(--ink)}
+.article-body p{margin-bottom:1.6rem}
+.article-body p:first-child::first-letter{font-family:'Playfair Display',serif;font-size:4.2rem;font-weight:900;float:left;line-height:.75;margin-right:.1em;margin-top:.1em;color:var(--accent)}
+.article-body p:first-child{font-size:1.12rem;font-weight:400}
+
+/* Pull quote */
+.pull-quote{border-left:4px solid var(--accent);padding:1rem 1.5rem;margin:2rem 0;background:var(--cream);border-radius:0 6px 6px 0}
+.pull-quote p{font-family:'Playfair Display',serif;font-size:1.25rem;font-style:italic;line-height:1.4;color:var(--ink);margin:0}
+
+/* ── SHARE ── */
+.share-section{display:flex;align-items:center;gap:1rem;padding:2rem 0;border-top:1px solid var(--light-gray);border-bottom:1px solid var(--light-gray);margin:3rem 0 2rem}
+.share-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--warm-gray)}
+.share-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;border:1px solid var(--light-gray);border-radius:100px;font-size:.75rem;font-weight:600;cursor:pointer;background:none;transition:all .2s;font-family:'DM Sans',sans-serif;color:var(--ink)}
+.share-btn:hover{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.copy-btn{background:var(--cream)}
+.copy-btn.copied{background:var(--dark-olive);color:var(--paper);border-color:var(--dark-olive)}
+
+/* ── AUTHOR BOX ── */
+.author-box{background:var(--off-white);border:1px solid var(--light-gray);border-radius:8px;padding:1.8rem;margin-bottom:3rem;display:flex;gap:1.5rem;align-items:flex-start}
+.author-box-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:1.4rem;color:var(--paper);flex-shrink:0}
+.author-box-name{font-weight:700;font-size:1rem;margin-bottom:.2rem}
+.author-box-role{font-size:.75rem;color:var(--warm-gray);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em}
+.author-box-bio{font-family:'Source Serif 4',serif;font-size:.9rem;color:var(--warm-gray);line-height:1.5}
+
+/* ── RELATED ── */
+.related-section{padding:3rem 0}
+.related-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--ink);display:flex;align-items:center;gap:.8rem}
+.related-title span{font-size:.7rem;font-family:'DM Sans',sans-serif;font-weight:400;color:var(--warm-gray);text-transform:uppercase;letter-spacing:.1em}
+.related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.related-card{cursor:pointer;transition:transform .3s}
+.related-card:hover{transform:translateY(-3px)}
+.related-card img{width:100%;height:160px;object-fit:cover;border-radius:6px;margin-bottom:.8rem;background:var(--cream)}
+.related-card-cat{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:.4rem}
+.related-card h4{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;line-height:1.3;margin-bottom:.5rem}
+.related-card-meta{font-size:.7rem;color:var(--warm-gray)}
+
+/* ── FOOTER ── */
+footer{background:var(--ink);color:var(--cream);padding:2.5rem 0}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.4rem}
+.footer-logo span{color:var(--accent)}
+.footer-copy{font-size:.72rem;opacity:.4}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{font-size:.75rem;opacity:.5;transition:opacity .2s}
+.footer-links a:hover{opacity:1}
+
+/* ── LOADING ── */
+.skeleton{background:linear-gradient(90deg,var(--cream) 25%,var(--light-gray) 50%,var(--cream) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;color:transparent!important}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── PROGRESS BAR ── */
+.reading-progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:200;transition:width .1s linear;width:0%}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .article-title{font-size:1.8rem}
+  .related-grid{grid-template-columns:1fr}
+  .article-hero img{height:260px}
+  .author-box{flex-direction:column}
+  .meta-divider{display:none}
+  .article-meta{gap:1rem}
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .6s ease forwards}
+</style>
+</head>
+<body>
+
+<div class="reading-progress" id="reading-progress"></div>
+
+<header id="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="/" class="logo">
+        <div class="logo-mark">Built<span>.</span></div>
+        <div class="logo-tag">Digest — Real Estate Intelligence</div>
+      </a>
+      <div class="header-right">
+        <a href="/" class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7 7M5 12l7-7"/></svg>
+          Volver a portada
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="article-wrap" style="opacity:0;transition:opacity .4s">
+
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="/">Inicio</a>
+      <span class="breadcrumb-sep">›</span>
+      <span id="bc-category" class="breadcrumb-sep">—</span>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current" id="bc-title">Cargando...</span>
+    </nav>
+  </div>
+
+  <div class="article-container">
+
+    <!-- HEADER -->
+    <div class="article-header fade-up">
+      <div class="article-category-badge" id="art-category">—</div>
+      <h1 class="article-title" id="art-title">Cargando noticia...</h1>
+      <p class="article-excerpt" id="art-excerpt"></p>
+
+      <div class="article-meta">
+        <div class="author-block">
+          <div class="author-avatar" id="art-avatar" style="background:var(--dark-olive)">—</div>
+          <div>
+            <div class="author-name" id="art-journalist">—</div>
+            <div class="author-bio" id="art-journalist-bio">—</div>
+          </div>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <div class="meta-label">Publicado</div>
+          <div class="meta-value" id="art-date">—</div>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <div class="meta-label">Lectura</div>
+          <div class="meta-value" id="art-readtime">— min</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO IMAGE -->
+    <div class="article-hero fade-up" id="art-hero" style="animation-delay:.15s">
+      <img id="art-image" src="" alt="" onerror="document.getElementById('art-hero').style.display='none'">
+      <div class="article-hero-caption" id="art-caption"></div>
+    </div>
+
+    <!-- BODY -->
+    <div class="article-body fade-up" id="art-body" style="animation-delay:.25s">
+    </div>
+
+    <!-- SHARE -->
+    <div class="share-section fade-up" style="animation-delay:.3s">
+      <span class="share-label">Compartir</span>
+      <button class="share-btn" onclick="shareTwitter()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Twitter / X
+      </button>
+      <button class="share-btn" onclick="shareLinkedIn()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </button>
+      <button class="share-btn copy-btn" id="copy-btn" onclick="copyLink()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar enlace
+      </button>
+    </div>
+
+    <!-- AUTHOR BOX -->
+    <div class="author-box fade-up" id="author-box" style="animation-delay:.35s">
+      <div class="author-box-avatar" id="author-box-avatar" style="background:var(--dark-olive)">—</div>
+      <div>
+        <div class="author-box-name" id="author-box-name">—</div>
+        <div class="author-box-role">Redacción Built Digest</div>
+        <div class="author-box-bio" id="author-box-bio">Periodista especializado en el mercado inmobiliario español.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RELATED -->
+  <div class="container">
+    <section class="related-section">
+      <div class="related-title">
+        Más noticias
+        <span>Del sector inmobiliario</span>
+      </div>
+      <div class="related-grid" id="related-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--warm-gray);font-size:.9rem">Cargando artículos relacionados...</div>
+      </div>
+    </section>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">Built<span>.</span>Digest</div>
+      <div class="footer-links">
+        <a href="/">Portada</a>
+        <a href="/#noticias">Noticias</a>
+        <a href="/#rankings">Rankings</a>
+        <a href="/#datos-mensuales">Datos</a>
+      </div>
+      <div class="footer-copy">© 2020-2026 Built Digest · Madrid</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── UTILS ──────────────────────────────────────────────────────
+const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.getDate() + ' de ' + months[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+const categoryColors = {
+  'Inversión':'#9b2c27','Residencial':'#3a3d2f','Oficinas':'#b8952f',
+  'Regulación':'#6b7355','Mercado':'#5a6a7a','Logística':'#5a4a3a',
+  'SOCIMIs':'#b8952f','Proptech':'#4a5a6a','Comercial':'#7a4a4a','Hotelero':'#6a5a7a',
+};
+
+const categoryImages = {
+  'Inversión':'photo-1600585154340-be6161a56a0c','Residencial':'photo-1560518883-ce09059eeffa',
+  'Oficinas':'photo-1582268611958-ebfd161ef9cf','Regulación':'photo-1582407947092-89f0419544f5',
+  'Mercado':'photo-1560448204-e02f11c3d0e2','Logística':'photo-1586528116311-ad8dd3c8310d',
+  'SOCIMIs':'photo-1460472178825-e5240623afd5','Proptech':'photo-1551288049-bebda4e38f71',
+  'Comercial':'photo-1441986300917-64674bd600d8','Hotelero':'photo-1566073771259-6a8506099945',
+};
+
+function getCategoryImage(category) {
+  const id = categoryImages[category] || categoryImages['Mercado'];
+  return `https://images.unsplash.com/${id}?w=500&h=300&fit=crop`;
+}
+
+// ── LEER ID DE LA URL ─────────────────────────────────────────
+function getArticleId() {
+  // /noticia/abc123
+  const parts = window.location.pathname.split('/');
+  return parts[parts.length - 1] || parts[parts.length - 2];
+}
+
+// ── CARGAR ARTÍCULO ───────────────────────────────────────────
+async function loadArticle() {
+  const id = getArticleId();
+  if (!id) { window.location = '/'; return; }
+
+  try {
+    const res = await fetch('/api/news?limit=60');
+    const data = await res.json();
+    const articles = data.articles || [];
+
+    const article = articles.find(a => a.id === id);
+    if (!article) {
+      document.getElementById('art-title').textContent = 'Noticia no encontrada';
+      document.getElementById('article-wrap').style.opacity = '1';
+      return;
+    }
+
+    // Meta
+    document.title = article.title + ' — Built Digest';
+    document.getElementById('page-desc').content = article.excerpt || '';
+
+    // Breadcrumb
+    document.getElementById('bc-category').textContent = article.category || '—';
+    document.getElementById('bc-title').textContent = article.title;
+
+    // Header
+    document.getElementById('art-category').textContent = article.category || '';
+    document.getElementById('art-title').textContent = article.title;
+    document.getElementById('art-excerpt').textContent = article.excerpt || '';
+
+    // Meta
+    document.getElementById('art-date').textContent = formatDate(article.publishedAt);
+    document.getElementById('art-readtime').textContent = (article.readTime || 5) + ' min';
+
+    // Autor
+    const color = categoryColors[article.category] || '#3a3d2f';
+    const initials = article.journalistInitials || (article.journalist || '?').split(' ').map(w=>w[0]).join('').substring(0,2);
+
+    document.getElementById('art-avatar').textContent = initials;
+    document.getElementById('art-avatar').style.background = color;
+    document.getElementById('art-journalist').textContent = article.journalist || '—';
+    document.getElementById('art-journalist-bio').textContent = article.journalistBio || 'Redacción Built Digest';
+
+    document.getElementById('author-box-avatar').textContent = initials;
+    document.getElementById('author-box-avatar').style.background = color;
+    document.getElementById('author-box-name').textContent = article.journalist || '—';
+    document.getElementById('author-box-bio').textContent = article.journalistBio || 'Periodista especializado en el mercado inmobiliario español.';
+
+    // Imagen
+    const img = document.getElementById('art-image');
+    const imgSrc = article.image || getCategoryImage(article.category);
+    img.src = imgSrc;
+    img.alt = article.category || '';
+    document.getElementById('art-caption').textContent = article.category + ' · Built Digest · ' + formatDate(article.publishedAt);
+
+    // Cuerpo
+    const body = article.body || article.excerpt || '';
+    const paragraphs = body.split(/\n\n+/).filter(p => p.trim());
+    const bodyHtml = paragraphs.map((p, i) => {
+      // Insertar pull quote después del 2º párrafo si hay suficientes
+      if (i === 2 && paragraphs.length >= 4) {
+        const quote = paragraphs[i].substring(0, 150).trim();
+        return `<div class="pull-quote"><p>${quote}...</p></div><p>${p}</p>`;
+      }
+      return `<p>${p}</p>`;
+    }).join('');
+    document.getElementById('art-body').innerHTML = bodyHtml;
+
+    // Relacionadas (otras noticias, excluyendo la actual)
+    const related = articles.filter(a => a.id !== id).slice(0, 3);
+    renderRelated(related);
+
+    // Mostrar
+    document.getElementById('article-wrap').style.opacity = '1';
+
+    // Scroll progress
+    setupReadingProgress();
+
+  } catch (err) {
+    console.error('Error cargando artículo:', err);
+    document.getElementById('art-title').textContent = 'Error al cargar la noticia';
+    document.getElementById('article-wrap').style.opacity = '1';
+  }
+}
+
+function renderRelated(articles) {
+  const grid = document.getElementById('related-grid');
+  if (!articles.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--warm-gray)">No hay más noticias disponibles.</div>';
+    return;
+  }
+  grid.innerHTML = articles.map(a => `
+    <article class="related-card" onclick="window.location='/noticia/${a.id}'">
+      <img src="${a.image || getCategoryImage(a.category)}" alt="${a.category}" onerror="this.style.display='none'">
+      <div class="related-card-cat">${a.category}</div>
+      <h4>${a.title}</h4>
+      <div class="related-card-meta">${a.journalist || ''} · ${formatShortDate(a.publishedAt)}</div>
+    </article>
+  `).join('');
+}
+
+function formatShortDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.getDate() + ' ' + months[d.getMonth()].substring(0,3);
+}
+
+// ── SHARE ─────────────────────────────────────────────────────
+function shareTwitter() {
+  const title = document.getElementById('art-title').textContent;
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${url}&via=BuiltDigest`, '_blank');
+}
+
+function shareLinkedIn() {
+  const url = encodeURIComponent(window.location.href);
+  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiado!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar enlace';
+    }, 2500);
+  });
+}
+
+// ── READING PROGRESS ──────────────────────────────────────────
+function setupReadingProgress() {
+  const bar = document.getElementById('reading-progress');
+  window.addEventListener('scroll', () => {
+    const body = document.getElementById('art-body');
+    if (!body) return;
+    const rect = body.getBoundingClientRect();
+    const bodyHeight = body.offsetHeight;
+    const scrolled = Math.max(0, -rect.top);
+    const pct = Math.min(100, (scrolled / bodyHeight) * 100);
+    bar.style.width = pct + '%';
+  }, { passive: true });
+}
+
+// ── HEADER SHADOW ON SCROLL ────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('site-header').style.boxShadow =
+    window.scrollY > 50 ? '0 2px 20px rgba(26,23,20,.08)' : 'none';
+}, { passive: true });
+
+loadArticle();
+</script>
+</body>
+</html>
