@@ -189,7 +189,7 @@ img.img-error{opacity:0!important;position:absolute}
 
 <!-- HERO (dynamically populated) -->
 <section class="hero"><div class="container"><div class="hero-grid animate-in" id="hero-container">
-<div class="hero-main" onclick="openModal(articles, 0)" style="cursor:pointer"><div class="hero-overlay"><div class="hero-category">Cargando</div><h1 class="hero-title" style="background:linear-gradient(90deg,var(--cream) 25%,var(--light-gray) 50%,var(--cream) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;color:transparent;border-radius:4px">Cargando noticias del día...</h1><p class="hero-excerpt" style="color:transparent">Conectando con la redacción de Built Digest</p></div></div>
+<div class="hero-main" onclick="window.location='/noticia/'+articles[0].id" style="cursor:pointer"><div class="hero-overlay"><div class="hero-category">Cargando</div><h1 class="hero-title" style="background:linear-gradient(90deg,var(--cream) 25%,var(--light-gray) 50%,var(--cream) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;color:transparent;border-radius:4px">Cargando noticias del día...</h1><p class="hero-excerpt" style="color:transparent">Conectando con la redacción de Built Digest</p></div></div>
 <div class="hero-sidebar"><div class="hero-side-card"><div class="hero-side-overlay"><div class="hero-category" style="background:var(--dark-olive)">—</div><h3 style="color:transparent;background:linear-gradient(90deg,rgba(255,255,255,.1) 25%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.1) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px">Cargando</h3></div></div><div class="hero-side-card"><div class="hero-side-overlay"><div class="hero-category" style="background:var(--gold)">—</div><h3 style="color:transparent;background:linear-gradient(90deg,rgba(255,255,255,.1) 25%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.1) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px">Cargando</h3></div></div></div>
 </div></div></section>
 
@@ -360,7 +360,7 @@ async function loadNews() {
       const side1 = articles[1];
       const side2 = articles[2];
       document.getElementById('hero-container').innerHTML = `
-        <div class="hero-main" onclick="openModal(articles, 0)" style="cursor:pointer">
+        <div class="hero-main" onclick="window.location='/noticia/'+articles[0].id" style="cursor:pointer">
           <img class="hero-main-img" src="${getImageUrl(hero.category, 900, hero.image)}" alt="${hero.category}" onerror="this.classList.add('img-error')">
           <div class="hero-overlay">
             <div class="hero-category">${hero.category}</div>
@@ -377,7 +377,7 @@ async function loadNews() {
           </div>
         </div>
         <div class="hero-sidebar">
-          <div class="hero-side-card animate-in delay-2">
+          <div class="hero-side-card animate-in delay-2" onclick="window.location='/noticia/'+side1.id" style="cursor:pointer">
             <img src="${getImageUrl(side1.category, 500, side1.image)}" alt="${side1.category}" onerror="this.classList.add('img-error')">
             <div class="hero-side-overlay">
               <div class="hero-category" style="background:${categoryColors[side1.category] || 'var(--dark-olive)'}">${side1.category}</div>
@@ -385,7 +385,7 @@ async function loadNews() {
               <div class="hero-meta"><span>${side1.journalist}</span><span>·</span><span>${formatShortDate(side1.publishedAt)}</span></div>
             </div>
           </div>
-          <div class="hero-side-card animate-in delay-3">
+          <div class="hero-side-card animate-in delay-3" onclick="window.location='/noticia/'+side2.id" style="cursor:pointer">
             <img src="${getImageUrl(side2.category, 500, side2.image)}" alt="${side2.category}" onerror="this.classList.add('img-error')">
             <div class="hero-side-overlay">
               <div class="hero-category" style="background:${categoryColors[side2.category] || 'var(--gold)'}">${side2.category}</div>
@@ -401,7 +401,7 @@ async function loadNews() {
     if (gridArticles.length > 0) {
       const readTimes = [5, 4, 6, 5, 7, 4];
       document.getElementById('news-grid').innerHTML = gridArticles.map((a, i) => `
-        <article class="news-card animate-in delay-${i + 1}" onclick="openModal(articles, ${i + 3})" style="cursor:pointer">
+        <article class="news-card animate-in delay-${i + 1}" onclick="window.location='/noticia/'+a.id" style="cursor:pointer">
           <img class="news-card-img" src="${getImageUrl(a.category, 500, a.image)}" alt="${a.category}" onerror="this.classList.add('img-error')">
           <div class="news-card-category">${a.category}</div>
           <h3>${a.title}</h3>
