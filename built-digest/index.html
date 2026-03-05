@@ -210,38 +210,18 @@ img.img-error{opacity:0!important;position:absolute}
 <div class="opinion-card animate-in delay-2"><div class="opinion-avatar" style="background:var(--sage)">MG</div><div><h3>España seguirá siendo un mercado atractivo, respaldado por un crecimiento superior a la media europea y por la fortaleza de segmentos estratégicos</h3><div class="opinion-author">Miriam Goicoechea</div><div class="opinion-role">Head of Research Iberia, CBRE</div></div></div>
 </div></div></section>
 
-<!-- DATA STRIP -->
+<!-- DATA STRIP (live from INE API) -->
 <div class="data-strip" id="datos">
 <div class="container">
 <div style="text-align:center;margin-bottom:2.5rem">
 <span style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;display:block;margin-bottom:.4rem">Radiografía del mercado</span>
-<span style="font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;font-weight:500;opacity:.65">12 indicadores clave · Datos verificados · Febrero 2026</span>
+<span style="font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;font-weight:500;opacity:.65" id="radiografia-fecha">Datos oficiales INE · Actualización automática</span>
 </div>
-<div style="margin-bottom:.8rem"><span style="font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;opacity:.5;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:.3rem">▎ Precios vs Accesibilidad — El desequilibrio que define el mercado</span></div>
-<div class="data-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:2.5rem">
-<div class="data-item animate-in delay-1"><h3>2.350€</h3><p>Precio m² segunda mano</p><div class="data-sub">+18,4% interanual · Ene 2026 · Récord histórico</div></div>
-<div class="data-item animate-in delay-2"><h3>3.365€</h3><p>Precio m² obra nueva</p><div class="data-sub">+8,9% interanual · Q1 2026 · Soc. Tasación</div></div>
-<div class="data-item animate-in delay-3"><h3>37,8%</h3><p>Esfuerzo hipotecario</p><div class="data-sub">% renta bruta para hipoteca · Banco de España</div></div>
-<div class="data-item animate-in delay-4"><h3>36%</h3><p>Esfuerzo en alquiler</p><div class="data-sub">+10pp sobre el 30% recomendado · 2025</div></div>
-</div>
-<div style="margin-bottom:.8rem"><span style="font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;opacity:.5;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:.3rem">▎ Déficit estructural — Se construye menos de lo que se necesita</span></div>
-<div class="data-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:2.5rem">
-<div class="data-item animate-in delay-1"><h3>~500k</h3><p>Déficit acumulado viviendas</p><div class="data-sub">Hogares creados vs terminadas · Banco de España</div></div>
-<div class="data-item animate-in delay-2"><h3>100.980</h3><p>Viviendas terminadas 2024</p><div class="data-sub">+13,1% · Máximo 12 años pero insuficiente</div></div>
-<div class="data-item animate-in delay-3"><h3>~140k</h3><p>Visados obra nueva 2025</p><div class="data-sub">+10% vs 2024 · Prev. BBVA Research</div></div>
-<div class="data-item animate-in delay-4" style="position:relative"><h3>155k</h3><p>Visados previstos 2026</p><div class="data-sub">+11% vs 2025 · Aún lejos de los 180k hogares/año</div></div>
-</div>
-<div style="text-align:center;margin:-1rem 0 1.5rem;opacity:.35;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase">
-<span style="display:inline-block;width:40px;height:1px;background:#fff;vertical-align:middle;margin-right:.8rem"></span>
-Esto explica que los precios suban mientras la inversión se dispara
-<span style="display:inline-block;width:40px;height:1px;background:#fff;vertical-align:middle;margin-left:.8rem"></span>
-</div>
-<div style="margin-bottom:.8rem"><span style="font-size:.6rem;text-transform:uppercase;letter-spacing:.2em;opacity:.5;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:.3rem">▎ Actividad e inversión — Un mercado a máximos pese a la escasez</span></div>
-<div class="data-grid" style="grid-template-columns:repeat(4,1fr)">
-<div class="data-item animate-in delay-1"><h3>725k</h3><p>Compraventas anuales est.</p><div class="data-sub">Estable vs 2025 · BBVA Research</div></div>
-<div class="data-item animate-in delay-2"><h3>17.000M</h3><p>Inversión inmobiliaria 2025</p><div class="data-sub">3er mejor registro histórico · ACI</div></div>
-<div class="data-item animate-in delay-3"><h3>1.323€</h3><p>Coste construcción m²</p><div class="data-sub">+3,8% · Máximo 5 años · Frena nueva oferta</div></div>
-<div class="data-item animate-in delay-4"><h3>27M</h3><p>Parque total viviendas</p><div class="data-sub">Récord · 455k nuevas sin vender · Dic 2024</div></div>
+<div id="radiografia-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center">
+<div class="data-item"><h3 style="background:rgba(255,255,255,.15);border-radius:4px;color:transparent;animation:shimmer 1.5s infinite">—</h3><p>Cargando...</p></div>
+<div class="data-item"><h3 style="background:rgba(255,255,255,.15);border-radius:4px;color:transparent;animation:shimmer 1.5s infinite">—</h3><p>Cargando...</p></div>
+<div class="data-item"><h3 style="background:rgba(255,255,255,.15);border-radius:4px;color:transparent;animation:shimmer 1.5s infinite">—</h3><p>Cargando...</p></div>
+<div class="data-item"><h3 style="background:rgba(255,255,255,.15);border-radius:4px;color:transparent;animation:shimmer 1.5s infinite">—</h3><p>Cargando...</p></div>
 </div>
 </div>
 </div>
@@ -479,6 +459,65 @@ function renderChange(value, label) {
   return `<div class="indicator-change ${cls}"><span class="arrow">${arrow}</span>${sign}${value.toFixed(1)}% ${label}</div>`;
 }
 
+// ─── RADIOGRAFÍA DEL MERCADO (live INE) ──────────────────────
+function renderRadiografia(indicators) {
+  const grid = document.getElementById('radiografia-grid');
+  if (!grid) return;
+
+  // Los 4 indicadores clave para la radiografía
+  const items = [
+    {
+      key: 'ipv',
+      label: 'Índice de Precios de Vivienda',
+      sub: 'Variación interanual · INE',
+      fallback: '+12.8%'
+    },
+    {
+      key: 'hipotecas',
+      label: 'Hipotecas constituidas',
+      sub: 'Último mes registrado · INE',
+      fallback: '37.841'
+    },
+    {
+      key: 'compraventas',
+      label: 'Compraventas de viviendas',
+      sub: 'Último mes registrado · INE',
+      fallback: '—'
+    },
+    {
+      key: 'tipo_interes',
+      label: 'Tipo de interés medio',
+      sub: 'Hipotecas nuevas · INE',
+      fallback: '2.87%'
+    },
+  ];
+
+  grid.style.gridTemplateColumns = 'repeat(4,1fr)';
+  grid.innerHTML = items.map(item => {
+    const ind = indicators[item.key];
+    const value = ind ? ind.latest.formatted : item.fallback;
+    const yoy = ind ? ind.changes.yoy : null;
+    const mom = ind ? ind.changes.mom : null;
+    const date = ind ? ind.latest.date : '';
+    const changeVal = yoy !== null ? yoy : mom;
+    const changeLabel = yoy !== null ? 'interanual' : 'mensual';
+    const changeHtml = changeVal !== null
+      ? `<div class="data-sub" style="margin-top:.4rem">${changeVal > 0 ? '▲' : '▼'} ${Math.abs(changeVal).toFixed(1)}% ${changeLabel}${date ? ' · ' + date : ''}</div>`
+      : `<div class="data-sub">${date || item.sub}</div>`;
+    return `<div class="data-item animate-in">
+      <h3>${value}</h3>
+      <p>${item.label}</p>
+      ${changeHtml}
+    </div>`;
+  }).join('');
+
+  // Actualizar fecha
+  const fechaEl = document.getElementById('radiografia-fecha');
+  if (fechaEl && indicators.ipv) {
+    fechaEl.textContent = 'Datos oficiales INE · Actualizado ' + indicators.ipv.latest.date;
+  }
+}
+
 async function loadMonthlyData() {
   try {
     const res = await fetch('/api/data');
@@ -493,6 +532,7 @@ async function loadMonthlyData() {
       return;
     }
 
+    renderRadiografia(data.indicators);
     document.getElementById('indicator-grid').innerHTML = available.map(key => {
       const ind = data.indicators[key];
       return `
