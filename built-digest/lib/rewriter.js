@@ -3,8 +3,6 @@ const { assignJournalist } = require("./journalists");
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// Picsum Photos — gratis, sin API key, imágenes reales de alta calidad
-// Usamos IDs fijos por categoría para que las imágenes sean coherentes
 const CATEGORY_IMAGE_IDS = {
   "Residencial": [164, 165, 323, 366, 431, 478, 534],
   "Oficinas":    [1029, 1033, 1040, 1048, 1060, 1074, 1080],
@@ -21,29 +19,30 @@ const CATEGORY_IMAGE_IDS = {
 
 function getImageUrl(category, seed) {
   const ids = CATEGORY_IMAGE_IDS[category] || CATEGORY_IMAGE_IDS["default"];
-  // Usar el seed para elegir siempre la misma imagen para el mismo artículo
-  const seedNum = seed ? seed.split('').reduce((a, c) => a + c.charCodeAt(0), 0) : 0;
+  const seedNum = seed ? seed.split("").reduce((a, c) => a + c.charCodeAt(0), 0) : 0;
   const id = ids[seedNum % ids.length];
-  return `https://picsum.photos/id/${id}/800/450`;
+  return `https://picsum.photos/id/${id}/1200/600`;
 }
 
-const SYSTEM_PROMPT = `Eres el editor de Built Digest, portal de noticias inmobiliarias español independiente.
-Tu trabajo es REESCRIBIR noticias del sector inmobiliario español para publicarlas como propias.
+const SYSTEM_PROMPT = `Eres el editor jefe de Built Digest, portal de noticias inmobiliarias español de referencia.
+Reescribes noticias del sector inmobiliario español con calidad editorial de primer nivel.
 
 REGLAS ESTRICTAS:
-1. NUNCA copies frases textuales. Reescribe completamente.
-2. Mantén los DATOS numéricos exactos (cifras, porcentajes, precios, metros cuadrados).
+1. NUNCA copies frases textuales de la fuente. Reescribe completamente con voz propia.
+2. Mantén todos los DATOS numéricos exactos (cifras, porcentajes, precios, metros cuadrados).
 3. Mantén los NOMBRES propios correctos (empresas, personas, ubicaciones).
-4. Tono editorial, profesional, directo. Sin lenguaje genérico de IA.
-5. Español de España (no latinoamericano).
+4. Tono: periodístico, directo, con criterio. Como El Confidencial o Cinco Días.
+5. Español de España. Sin latinismos.
 6. NO menciones la fuente original.
+7. El cuerpo debe tener 5-6 párrafos completos, cada uno de 3-4 frases. Contexto, datos, implicaciones, perspectiva.
 
 RESPONDE ÚNICAMENTE con JSON válido, sin markdown ni backticks:
 {
-  "title": "Titular reescrito (máx 120 chars, impactante, con dato clave)",
-  "excerpt": "Entradilla de 2 frases (máx 200 chars). Gancho + contexto.",
-  "body": "Cuerpo de 3-4 párrafos. Datos, contexto, implicaciones.",
-  "category": "Residencial|Oficinas|Inversión|Regulación|Mercado|Logística|SOCIMIs|Proptech|Comercial|Hotelero"
+  "title": "Titular (máx 120 chars, con el dato clave, impactante)",
+  "excerpt": "Entradilla de 2-3 frases (máx 250 chars). El qué, por qué importa, dato principal.",
+  "body": "Cuerpo completo con 5-6 párrafos separados por \\n\\n. Cada párrafo de 3-4 frases con datos, contexto y análisis. NO uses subtítulos. Flujo narrativo continuo.",
+  "category": "Residencial|Oficinas|Inversión|Regulación|Mercado|Logística|SOCIMIs|Proptech|Comercial|Hotelero",
+  "readTime": 5
 }`;
 
 async function rewriteArticle(article) {
@@ -53,20 +52,20 @@ async function rewriteArticle(article) {
   try {
     const response = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
-      max_tokens: 900,
+      max_tokens: 1400,
       temperature: 0.7,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
-          content: `Reescribe esta noticia del sector inmobiliario español:
+          content: `Reescribe esta noticia del sector inmobiliario español con profundidad editorial:
 
 TITULAR ORIGINAL: ${article.originalTitle}
 EXTRACTO: ${article.originalExcerpt}
-CATEGORÍA DETECTADA: ${article.category}
-PERIODISTA ASIGNADO: ${journalist.name} (${journalist.bio})
+CATEGORÍA: ${article.category}
+PERIODISTA: ${journalist.name} (${journalist.bio})
 
-Responde solo con JSON estricto.`,
+Responde solo con JSON estricto. El body debe tener 5-6 párrafos ricos en datos y contexto.`,
         },
       ],
     });
@@ -78,16 +77,18 @@ Responde solo con JSON estricto.`,
 
     return {
       id,
-      title: parsed.title,
-      excerpt: parsed.excerpt,
-      body: parsed.body || "",
+      title:               parsed.title,
+      excerpt:             parsed.excerpt,
+      body:                parsed.body || "",
       category,
-      image: getImageUrl(category, id),
-      journalist: journalist.name,
-      journalistInitials: journalist.initials,
-      publishedAt: new Date().toISOString(),
-      originalSource: article.sourceId,
-      originalUrl: article.originalUrl,
+      readTime:            parsed.readTime || 5,
+      image:               getImageUrl(category, id),
+      journalist:          journalist.name,
+      journalistInitials:  journalist.initials,
+      journalistBio:       journalist.bio,
+      publishedAt:         new Date().toISOString(),
+      originalSource:      article.sourceId,
+      originalUrl:         article.originalUrl,
     };
   } catch (err) {
     console.error(`[rewriter] Error: "${article.originalTitle}":`, err.message);
@@ -101,7 +102,7 @@ async function rewriteBatch(articles, maxArticles = 8) {
   for (const article of toProcess) {
     const rewritten = await rewriteArticle(article);
     if (rewritten) results.push(rewritten);
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 400));
   }
   console.log(`[rewriter] ${results.length}/${toProcess.length} artículos procesados`);
   return results;
